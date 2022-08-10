@@ -38,7 +38,7 @@ class ProjectsRepository(BaseRepository):
 
         return [ProjectDomain(**dict(row)) for row in projects_rows]
 
-    async def get_project(self, *, user: UserDomain, project_id) -> ProjectDomain:
+    async def get_project(self, *, user: UserDomain, project_id: int) -> ProjectDomain:
         sql = """
             SELECT * FROM projects WHERE owner_id=($1) AND id=($2);
         """
@@ -50,30 +50,43 @@ class ProjectsRepository(BaseRepository):
         )
 
         if project_row:
-            return ProjectDomain(**dict(project_row))
+            return ProjectDomain(**dict(*project_row))
 
         raise EntityDoesNotExist("project does not exists")
 
-    async def delete_project(self, *, project_id):
+    async def remove_project(self, *, user: UserDomain, project_id: int):
         sql = """
-            DELETE FROM projects WHERE id=($1);
+            DELETE FROM projects WHERE id=($1) AND owner_id=($2);
         """
 
-        project_row = await self.connection.fetch(
+        await self.connection.fetch(
             sql,
-            project_id
+            project_id,
+            user.id
         )
-
-        if project_row:
-            return ProjectDomain(**dict(project_row))
-
-        raise EntityDoesNotExist("project does not exists")
 
     async def update_project(
         self,
         *,
-        projects: ProjectDomain,
+        project: ProjectDomain,
         title,
         description,
     ):
-        pass
+        sql = """
+            UPDATE projects
+            SET title=($1), description=($2), updated_at=now()
+            WHERE id=1
+            RETURNING updated_at;
+        """
+
+        updated_project = project.copy(deep=True)
+        updated_project.title = title or project.title
+        updated_project.description = description or project.description
+
+        updated_project.updated_at = await self.connection.fetch(
+            sql,
+            updated_project.title,
+            updated_project.description
+        )
+
+        return updated_project

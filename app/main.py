@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, Path, Body, HTTPException
-from starlette.status import HTTP_400_BAD_REQUEST
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 import asyncpg
@@ -11,7 +11,7 @@ from app.db.repositories.projects import ProjectsRepository
 from app.models.domains.users import UserDomain
 from app.models.domains.projects import ProjectDomain
 from app.models.schemas.users import UserInSignup, UserInResponse, UserInSignin
-from app.models.schemas.projects import ProjectInResponse, ListOfProjectsInResponse, ProjectInCreate
+from app.models.schemas.projects import ProjectInResponse, ListOfProjectsInResponse, ProjectInCreate, ProjectInUpdate
 from app.services.jwt import create_access_token_for_user
 from app.api.dependencies.authentication import get_current_user_authorizer
 from loguru import logger
@@ -107,11 +107,14 @@ async def create_project(
     return ProjectInResponse(**project.dict())
 
 
-@app.get('/projects')
+@app.get(
+    '/projects',
+    response_model=ListOfProjectsInResponse
+)
 async def get_all_projects(
     project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository)),
     user: UserDomain = Depends(get_current_user_authorizer())
-):
+) -> ListOfProjectsInResponse:
     projects = await project_repo.get_all_projects(user=user)
 
     projects_for_response = [
@@ -123,5 +126,45 @@ async def get_all_projects(
         count=len(projects_for_response)
     )
 
-# TODO: add endpoints to /projetc/{id}
 
+@app.get('/project/{project_id}')
+async def retrieve_project_by_id(
+    project_id: int,
+    project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository)),
+    user: UserDomain = Depends(get_current_user_authorizer())
+) -> ProjectInResponse:
+    project = await project_repo.get_project(user=user, project_id=int(project_id))
+
+    return ProjectInResponse(**project.dict())
+
+
+# TODO: rewrite
+@app.put('/project/{project_id}')
+async def update_project(
+    project_id: int,
+    project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository)),
+    user: UserDomain = Depends(get_current_user_authorizer()),
+    project_update: ProjectInUpdate = Body(...)
+) -> ProjectInResponse:
+    project = await project_repo.get_project(user=user, project_id=project_id)
+    new_project = await project_repo.update_project(
+        project=project,
+        **project_update.dict()
+    )
+    return ProjectInResponse(**new_project.dict())
+
+
+@app.delete(
+    '/project/{project_id}',
+    status_code=HTTP_204_NO_CONTENT,
+)
+async def remove_project(
+    project_id: int,
+    project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository)),
+    user: UserDomain = Depends(get_current_user_authorizer())
+):
+    await project_repo.remove_project(user=user, project_id=project_id)
+
+
+# TODO: Rewrote endpoint names. example: update_project_by_id
+# TODO: Rewrite dependencies to get_projects_by_slug_from_path and check_article_modification_permissions

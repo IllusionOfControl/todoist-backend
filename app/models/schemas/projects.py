@@ -12,6 +12,11 @@ class ProjectInCreate(BaseModel):
     title: str
 
 
+class ProjectInUpdate(BaseModel):
+    title: Optional[str]
+    description: Optional[str]
+
+
 class ListOfProjectsInResponse(BaseModel):
     projects: List[ProjectInResponse]
     count: int

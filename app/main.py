@@ -12,6 +12,7 @@ from app.models.domains.users import UserDomain
 from app.models.domains.projects import ProjectDomain
 from app.models.schemas.users import UserInSignup, UserInResponse, UserInSignin
 from app.models.schemas.projects import ProjectInResponse, ListOfProjectsInResponse, ProjectInCreate, ProjectInUpdate
+from app.services.authentication import check_username_is_taken, check_email_is_taken
 from app.services.jwt import create_access_token_for_user
 from app.api.dependencies.authentication import get_current_user_authorizer
 from loguru import logger
@@ -65,10 +66,27 @@ async def retrieve_profile_by_username(
 
 @app.post('/auth/signup')
 async def register_user(
-    user: UserInSignup = Body(...),
-    user_repo: UsersRepository = Depends(get_repository(UsersRepository))
+    user_signup: UserInSignup = Body(...),
+    users_repo: UsersRepository = Depends(get_repository(UsersRepository))
 ):
-    return await user_repo.create_user(**user.dict())
+    if await check_username_is_taken(users_repo, user_signup.username):
+        raise HTTPException(
+            status_code=HTTP_400_BAD_REQUEST,
+            # detail=strings.USERNAME_TAKEN,
+        )
+
+    if await check_email_is_taken(users_repo, user_signup.email):
+        raise HTTPException(
+            status_code=HTTP_400_BAD_REQUEST,
+            # detail=strings.EMAIL_TAKEN,
+        )
+    user = await users_repo.create_user(**user_signup.dict())
+
+    token = create_access_token_for_user(
+        user,
+        "SECRET"
+    )
+    return UserInResponse(**user.dict(), token=token)
 
 
 @app.post('/auth/signin')

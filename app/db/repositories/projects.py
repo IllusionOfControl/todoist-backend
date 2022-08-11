@@ -26,7 +26,7 @@ class ProjectsRepository(BaseRepository):
 
         return ProjectDomain(**dict(*project_row))
 
-    async def get_all_projects(self, *, user: UserDomain) -> List[ProjectDomain]:
+    async def get_all_projects_by_user(self, *, user: UserDomain) -> List[ProjectDomain]:
         sql = """
             SELECT * FROM projects WHERE owner_id=($1);
         """
@@ -38,14 +38,13 @@ class ProjectsRepository(BaseRepository):
 
         return [ProjectDomain(**dict(row)) for row in projects_rows]
 
-    async def get_project(self, *, user: UserDomain, project_id: int) -> ProjectDomain:
+    async def get_project_by_id(self, *, project_id: int) -> ProjectDomain:
         sql = """
-            SELECT * FROM projects WHERE owner_id=($1) AND id=($2);
+            SELECT * FROM projects WHERE id=($1);
         """
 
         project_row = await self.connection.fetch(
             sql,
-            user.id,
             project_id
         )
 
@@ -53,17 +52,6 @@ class ProjectsRepository(BaseRepository):
             return ProjectDomain(**dict(*project_row))
 
         raise EntityDoesNotExist("project does not exists")
-
-    async def remove_project(self, *, user: UserDomain, project_id: int):
-        sql = """
-            DELETE FROM projects WHERE id=($1) AND owner_id=($2);
-        """
-
-        await self.connection.fetch(
-            sql,
-            project_id,
-            user.id
-        )
 
     async def update_project(
         self,
@@ -74,8 +62,8 @@ class ProjectsRepository(BaseRepository):
     ):
         sql = """
             UPDATE projects
-            SET title=($1), description=($2), updated_at=now()
-            WHERE id=1
+            SET title=($2), description=($3), updated_at=now()
+            WHERE id=($1)
             RETURNING updated_at;
         """
 
@@ -85,8 +73,19 @@ class ProjectsRepository(BaseRepository):
 
         updated_project.updated_at = await self.connection.fetch(
             sql,
+            project.id,
             updated_project.title,
             updated_project.description
         )
 
         return updated_project
+
+    async def remove_project(self, *, project: ProjectDomain):
+        sql = """
+            DELETE FROM projects WHERE id=($1);
+        """
+
+        await self.connection.fetch(
+            sql,
+            project.id
+        )

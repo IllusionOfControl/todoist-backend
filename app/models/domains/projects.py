@@ -4,7 +4,7 @@ from typing import Optional
 
 
 class ProjectDomain(BaseModel):
-    id: str
+    id: int
     owner_id: int
     title: str
     description: Optional[str] = ""

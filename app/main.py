@@ -1,58 +1,41 @@
 from fastapi import FastAPI, Depends, Path, Body, HTTPException
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT
-from pydantic import BaseModel
-from datetime import datetime, timedelta
-import asyncpg
-import jwt
 from app.api.dependencies.database import get_repository
 from app.db.errors import EntityDoesNotExist
 from app.db.repositories.users import UsersRepository
 from app.db.repositories.projects import ProjectsRepository
 from app.models.domains.users import UserDomain
-from app.models.domains.projects import ProjectDomain
 from app.models.schemas.users import UserInSignup, UserInResponse, UserInSignin
 from app.models.schemas.projects import ProjectInResponse, ListOfProjectsInResponse, ProjectInCreate, ProjectInUpdate
 from app.services.authentication import check_username_is_taken, check_email_is_taken
 from app.services.jwt import create_access_token_for_user
 from app.api.dependencies.authentication import get_current_user_authorizer
-from loguru import logger
-from typing import Callable
+from app.core.events import create_start_app_handler, create_stop_app_handler
+from app.core.config import get_app_settings
 
 
 # TODO: Rewrite main.py
-# TODO: Add config system
-# TODO: Add logging with loguru
+# TODO: Write tests
 # TODO: Add error handling
 # TODO: Move duplicate code to dependencies
+# TODO: Add strings
+
+settings = get_app_settings()
+settings.configure_logging()
 
 app = FastAPI(
-    docs_url="/docs",
+    **settings.fastapi_kwargs
 )
 
 
-def create_start_app_handler(
-    app: FastAPI,
-) -> Callable:  # type: ignore
-    async def start_app() -> None:
-        await connect_to_db(app)
-
-    return start_app
-
-
-async def connect_to_db(app: FastAPI) -> None:
-    logger.info("Connecting to PostgreSQL")
-
-    app.state.pool = await asyncpg.create_pool(
-        "postgresql://postgres:Qw123456@postgres.turnkey.vm/todoist",
-        min_size=2,
-        max_size=2,
-    )
-
-    logger.info("Connection established")
-
 app.add_event_handler(
     "startup",
-    create_start_app_handler(app),
+    create_start_app_handler(app, settings),
+)
+
+app.add_event_handler(
+    "shutdown",
+    create_stop_app_handler(app, settings),
 )
 
 

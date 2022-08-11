@@ -69,10 +69,10 @@ async def retrieve_project_by_id(
 async def update_project_by_id(
     project_update: ProjectInUpdate = Body(...),
     project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository)),
-    current_project: ProjectDomain = Depends(get_project_by_id_from_path)
+    project: ProjectDomain = Depends(get_project_by_id_from_path)
 ) -> ProjectInResponse:
     new_project = await project_repo.update_project(
-        project=current_project,
+        project=project,
         **project_update.dict()
     )
     print(new_project)
@@ -80,14 +80,14 @@ async def update_project_by_id(
 
 
 @router.delete(
-    '/project/{project_id}',
+    '/{project_id}',
     status_code=status.HTTP_204_NO_CONTENT,
     name="project:remove-project",
     dependencies=[Depends(check_project_ownership)],
     response_class=Response
 )
 async def remove_project(
-    current_project: ProjectDomain = Depends(get_project_by_id_from_path),
+    project: ProjectDomain = Depends(get_project_by_id_from_path),
     project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository))
 ) -> None:
-    await project_repo.remove_project(project=current_project)
+    await project_repo.remove_project(project=project)

@@ -1,30 +1,39 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.events import create_start_app_handler, create_stop_app_handler
 from app.core.config import get_app_settings
 from app.api.routes.api import router
 
 
-# TODO: Rewrite main.py
-# TODO: Write tests
-# TODO: Add error handling
-# TODO: Add strings
+def get_application() -> FastAPI:
+    settings = get_app_settings()
+    settings.configure_logging()
 
-settings = get_app_settings()
-settings.configure_logging()
+    application = FastAPI(
+        **settings.fastapi_kwargs
+    )
 
-app = FastAPI(
-    **settings.fastapi_kwargs
-)
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.allowed_hosts,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
-app.include_router(router)
+    application.add_event_handler(
+        "startup",
+        create_start_app_handler(application, settings),
+    )
+
+    application.add_event_handler(
+        "shutdown",
+        create_stop_app_handler(application, settings),
+    )
+
+    application.include_router(router)
+
+    return application
 
 
-app.add_event_handler(
-    "startup",
-    create_start_app_handler(app, settings),
-)
-
-app.add_event_handler(
-    "shutdown",
-    create_stop_app_handler(app, settings),
-)
+app = get_application()

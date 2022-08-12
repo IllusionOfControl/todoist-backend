@@ -24,7 +24,7 @@ class TaskRepository(BaseRepository):
             title,
             project.id
         )
-        print(task_row)
+
         return TaskDomain(**dict(*task_row))
 
     async def get_task_by_id(self, *, task_id: int) -> TaskDomain:

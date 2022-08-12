@@ -75,7 +75,7 @@ async def update_project_by_id(
         project=project,
         **project_update.dict()
     )
-    print(new_project)
+
     return ProjectInResponse(**new_project.dict())
 
 

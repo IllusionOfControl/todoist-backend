@@ -57,7 +57,7 @@ const todoistAPI = {
 
     deleteProject: async (project_id) => {
         return await axios({
-            method: 'GET',
+            method: 'DELETE',
             url: `${API_URL}/projects`,
             headers: { 'Authorization': 'Token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NjA3NTY1ODgsInN1YiI6ImFjY2VzcyJ9._EfD0m_peFl0dRupDKLx1W8NPwJAu3MX-y3YB8ku9gs' }
         }).catch(error => {
@@ -69,7 +69,7 @@ const todoistAPI = {
 
     addNewTask: async (project_id, new_task_data) => {
         return await axios({
-            method: 'GET',
+            method: 'POST',
             url: `${API_URL}/projects/${project_id}/tasks/`,
             headers: { 'Authorization': 'Token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NjA3NTY1ODgsInN1YiI6ImFjY2VzcyJ9._EfD0m_peFl0dRupDKLx1W8NPwJAu3MX-y3YB8ku9gs' },
             data: new_task_data

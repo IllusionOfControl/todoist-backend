@@ -39,14 +39,14 @@ async def list_projects(
     task_repo: TaskRepository = Depends(get_repository(TaskRepository)),
     project: ProjectDomain = Depends(get_project_by_id_from_path)
 ) -> ListOfTasksInResponse:
-    projects = await task_repo.get_all_tasks_by_project(project=project)
+    tasks = await task_repo.get_all_tasks_by_project(project=project)
 
     tasks_for_response = [
-        TaskInResponse(**project.dict()) for project in projects
+        TaskInResponse(**task.dict()) for task in tasks
     ]
 
     return ListOfTasksInResponse(
-        projects=tasks_for_response,
+        tasks=tasks_for_response,
         count=len(tasks_for_response)
     )
 

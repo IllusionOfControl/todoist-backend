@@ -26,5 +26,5 @@ class ProjectInUpdate(BaseModel):
 
 
 class ListOfTasksInResponse(BaseModel):
-    projects: List[TaskInResponse]
+    tasks: List[TaskInResponse]
     count: int

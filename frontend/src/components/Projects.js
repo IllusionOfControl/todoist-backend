@@ -4,19 +4,17 @@ import { useSelectedProjectValue, useProjectsValue } from '../context';
 import { IndividualProject } from './IndividualProject';
 
 export const Projects = ({ activeValue = null }) => {
-  const [active, setActive] = useState(activeValue);
-  const { setSelectedProject } = useSelectedProjectValue();
+  const { selectedProject, setSelectedProject } = useSelectedProjectValue();
   const { projects } = useProjectsValue();
 
   return (
     projects &&
     projects.map((project) => (
       <li
-        key={project.projectId}
+        key={project.id}
         data-testid="project-action-parent"
-        data-doc-id={project.docId}
         className={
-          active === project.projectId
+          selectedProject === project.id
             ? 'active sidebar__project'
             : 'sidebar__project'
         }
@@ -27,13 +25,11 @@ export const Projects = ({ activeValue = null }) => {
           tabIndex={0}
           aria-label={`Select ${project.name} as the task project`}
           onClick={() => {
-            setActive(project.projectId);
-            setSelectedProject(project.projectId);
+            setSelectedProject(project.id);
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              setActive(project.projectId);
-              setSelectedProject(project.projectId);
+              setSelectedProject(project.id);
             }
           }}
         >

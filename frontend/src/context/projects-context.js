@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useProjects } from '../hooks';
 
 export const ProjectsContext = createContext();
+
 export const ProjectsProvider = ({ children }) => {
   const { projects, setProjects } = useProjects();
 

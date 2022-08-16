@@ -15,16 +15,16 @@ export const ProjectOverlay = ({
       <div className="project-overlay" data-testid="project-overlay">
         <ul className="project-overlay__list">
           {projects.map((project) => (
-            <li key={project.projectId}>
+            <li key={project.id}>
               <div
                 data-testid="project-overlay-action"
                 onClick={() => {
-                  setProject(project.projectId);
+                  setProject(project.id);
                   setShowProjectOverlay(false);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    setProject(project.projectId);
+                    setProject(project.id);
                     setShowProjectOverlay(false);
                   }
                 }}
@@ -32,7 +32,7 @@ export const ProjectOverlay = ({
                 tabIndex={0}
                 aria-label="Select the task project"
               >
-                {project.name}
+                {project.title}
               </div>
             </li>
           ))}

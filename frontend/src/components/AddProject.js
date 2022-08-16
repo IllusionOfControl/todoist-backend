@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { generatePushId } from '../helpers';
 import { useProjectsValue } from '../context';
+import { todoistAPI } from '../api'
 
 export const AddProject = ({ shouldShow = false }) => {
   const [show, setShow] = useState(shouldShow);
   const [projectName, setProjectName] = useState('');
-
-  const projectId = generatePushId();
   const { projects, setProjects } = useProjectsValue();
 
-  const addProject = () => {}
+  const addProject = () => {
+    todoistAPI.addNewProject({'title': projectName}).then(() => {
+      setProjects([...projects]);
+      setProjectName('');
+      setShow(false);
+    })
+  }
 
   return (
     <div className="add-project" data-testid="add-project">

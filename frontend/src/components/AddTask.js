@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { useSelectedProjectValue } from '../context';
 import { ProjectOverlay } from './ProjectOverlay';
 import { TaskDate } from './TaskDate';
+import { todoistAPI } from '../api';
 
 export const AddTask = ({
   showAddTaskMain = true,
@@ -22,15 +23,18 @@ export const AddTask = ({
 
   const addTask = () => {
     const projectId = project || selectedProject;
-    let collatedDate = '';
 
-    if (projectId === 'TODAY') {
-      // collatedDate = moment().format('DD/MM/YYYY');
-    } else if (projectId === 'NEXT_7') {
-      // collatedDate = moment().add(7, 'days').format('DD/MM/YYYY');
-    }
-
-    return;
+    return (
+      task &&
+      projectId &&
+      todoistAPI.addNewTask(projectId, {title: 'task'})
+      .then(() => {
+        setTask('');
+        setProject('');
+        setShowMain('');
+        setShowProjectOverlay(false);
+      })
+    );
   };
 
   return (

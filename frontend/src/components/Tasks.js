@@ -23,7 +23,7 @@ export const Tasks = () => {
     selectedProject &&
     !collatedTasksExist(selectedProject)
   ) {
-    projectName = getTitle(projects, selectedProject).name;
+    projectName = getTitle(projects, selectedProject).title;
   }
 
   useEffect(() => {
@@ -37,8 +37,8 @@ export const Tasks = () => {
       <ul className="tasks__list">
         {tasks.map((task) => (
           <li key={`${task.id}`}>
-            <Checkbox id={task.id} taskDesc={task.task} />
-            <span>{task.task}</span>
+            <Checkbox id={task.id} taskDesc={task.title} />
+            <span>{task.title}</span>
           </li>
         ))}
       </ul>

@@ -31,7 +31,7 @@ def get_application() -> FastAPI:
         create_stop_app_handler(application, settings),
     )
 
-    application.include_router(router)
+    application.include_router(router, prefix=settings.api_prefix)
 
     return application
 

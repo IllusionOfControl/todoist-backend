@@ -5,7 +5,9 @@ from app.models.domains.users import UserDomain
 
 class UsersRepository(BaseRepository):
     async def get_user_by_username(self, *, username: str) -> UserDomain:
-        sql = """ SELECT * FROM users WHERE users.username=($1) """
+        sql = """ 
+            SELECT * FROM users WHERE users.username=$1 
+        """
 
         user_row = await self.connection.fetch(sql, username)
         if user_row:
@@ -15,9 +17,8 @@ class UsersRepository(BaseRepository):
 
     async def get_user_by_email(self, *, email: str) -> UserDomain:
         sql = """ SELECT * FROM users WHERE users.email=$1 """
-        query = await self.connection.prepare(sql)
 
-        user_row = await query.fetchval(email)
+        user_row = await self.connection.fetch(sql, email)
         if user_row:
             return UserDomain(**dict(*user_row))
 
@@ -30,8 +31,11 @@ class UsersRepository(BaseRepository):
         email: str,
         password: str
     ) -> UserDomain:
-        sql = """ INSERT INTO users (username, email, password_hash, password_salt)
-VALUES (($1), ($2), ($3), ($4)) RETURNING *; """
+        sql = """ 
+            INSERT INTO users (username, email, password_hash, password_salt)
+            VALUES (($1), ($2), ($3), ($4)) 
+            RETURNING *; 
+        """
 
         user = UserDomain(username=username, email=email)
         user.change_password(password)

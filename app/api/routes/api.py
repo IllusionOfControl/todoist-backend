@@ -6,9 +6,7 @@ from app.api.routes import (
     collated
 )
 
-
 router = APIRouter()
-
 
 router.include_router(authentication.router, tags=["authentication"], prefix="/auth")
 router.include_router(projects.router, tags=["projects"], prefix="/projects")

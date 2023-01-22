@@ -2,7 +2,6 @@ from app.db.repositories.base import BaseRepository
 from app.db.errors import EntityDoesNotExist
 from app.models.domains.tasks import TaskDomain
 from app.models.domains.projects import ProjectDomain
-from app.models.domains.users import UserDomain
 from typing import List
 from datetime import date
 
@@ -92,7 +91,7 @@ class TaskRepository(BaseRepository):
             task.id
         )
 
-    async def get_all_unfinished_tasks_by_user(self, user: UserDomain) -> List[TaskDomain]:
+    async def get_all_unfinished_tasks_by_owner_id(self, owner_id: int) -> List[TaskDomain]:
         sql = """
             SELECT * FROM tasks 
             WHERE is_finished=FALSE AND project_id=ANY(
@@ -102,12 +101,12 @@ class TaskRepository(BaseRepository):
 
         tasks_rows = await self.connection.fetch(
             sql,
-            user.id
+            owner_id
         )
 
         return [TaskDomain(**dict(row)) for row in tasks_rows]
 
-    async def get_tasks_for_next_7_days(self, user: UserDomain) -> List[TaskDomain]:
+    async def get_tasks_for_next_7_days(self, owner_id: int) -> List[TaskDomain]:
         sql = """
             SELECT * FROM tasks 
             WHERE is_finished=FALSE AND
@@ -119,24 +118,24 @@ class TaskRepository(BaseRepository):
 
         tasks_rows = await self.connection.fetch(
             sql,
-            user.id
+            owner_id
         )
 
         return [TaskDomain(**dict(row)) for row in tasks_rows]
 
-    async def get_tasks_for_today(self, user: UserDomain) -> List[TaskDomain]:
+    async def get_tasks_for_today(self, owner_id: int) -> List[TaskDomain]:
         sql = """
             SELECT * FROM tasks 
             WHERE is_finished=FALSE AND
                 scheduled_at=current_date AND
                 project_id=ANY(
-                    SELECT id FROM projects WHERE owner_id=($1)
+                    SELECT id FROM projects WHERE owner_id=$1
             ) ORDER BY created_at;
         """
 
         tasks_rows = await self.connection.fetch(
             sql,
-            user.id
+            owner_id
         )
 
         return [TaskDomain(**dict(row)) for row in tasks_rows]

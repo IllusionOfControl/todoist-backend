@@ -16,7 +16,7 @@ async def list_unfinished_tasks(
     current_user: UserDomain = Depends(get_current_user_authorizer()),
     task_repo: TaskRepository = Depends(get_repository(TaskRepository))
 ) -> ListOfTasksInResponse:
-    tasks = await task_repo.get_all_unfinished_tasks_by_user(current_user)
+    tasks = await task_repo.get_all_unfinished_tasks_by_owner_id(owner_id=current_user.id)
 
     tasks_for_response = [
         TaskInResponse(**task.dict()) for task in tasks
@@ -29,14 +29,14 @@ async def list_unfinished_tasks(
 
 
 @router.get(
-    "/next_7",
+    "/next7",
     response_model=ListOfTasksInResponse,
 )
 async def list_unfinished_tasks_for_next_7_days(
     current_user: UserDomain = Depends(get_current_user_authorizer()),
     task_repo: TaskRepository = Depends(get_repository(TaskRepository))
 ) -> ListOfTasksInResponse:
-    tasks = await task_repo.get_tasks_for_next_7_days(current_user)
+    tasks = await task_repo.get_tasks_for_next_7_days(owner_id=current_user.id)
 
     tasks_for_response = [
         TaskInResponse(**task.dict()) for task in tasks
@@ -52,11 +52,11 @@ async def list_unfinished_tasks_for_next_7_days(
     "/today",
     response_model=ListOfTasksInResponse,
 )
-async def list_unfinished_tasks_for_next_7_days(
+async def list_unfinished_tasks_for_today(
     current_user: UserDomain = Depends(get_current_user_authorizer()),
     task_repo: TaskRepository = Depends(get_repository(TaskRepository))
 ) -> ListOfTasksInResponse:
-    tasks = await task_repo.get_tasks_for_today(current_user)
+    tasks = await task_repo.get_tasks_for_today(owner_id=current_user.id)
 
     tasks_for_response = [
         TaskInResponse(**task.dict()) for task in tasks

@@ -4,12 +4,14 @@ import { AddTask } from './AddTask';
 import { useTasks } from '../hooks';
 import { collatedTasks } from '../constants';
 import { getTitle, getCollatedTitle, collatedTasksExist } from '../helpers';
-import { useSelectedProjectValue, useProjectsValue } from '../context';
+import {useSelectedProjectValue, useProjectsValue, useAuthorizationContext} from '../context';
+import {TodoistApi} from "../api/TodoistApi";
 
 export const Tasks = () => {
   const { selectedProject } = useSelectedProjectValue();
   const { projects } = useProjectsValue();
   const { tasks } = useTasks(selectedProject);
+  const {userCredentials} = useAuthorizationContext();
 
   let projectName = '';
 
@@ -30,6 +32,10 @@ export const Tasks = () => {
     document.title = `${projectName}: Todoist`;
   });
 
+  const handleCheck = (id) => {
+    TodoistApi.removeTask(selectedProject, id, userCredentials.token);
+  }
+
   return (
     <div className="tasks" data-testid="tasks">
       <h2 data-testid="project-name">{projectName}</h2>
@@ -37,7 +43,7 @@ export const Tasks = () => {
       <ul className="tasks__list">
         {tasks.map((task) => (
           <li key={`${task.id}`}>
-            <Checkbox id={task.id} taskDesc={task.title} />
+            <Checkbox id={task.id} taskDesc={task.title} onCheck={handleCheck}/>
             <span>{task.title}</span>
           </li>
         ))}

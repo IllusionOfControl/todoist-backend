@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useProjectsValue } from '../context';
-import { todoistAPI } from '../api'
+import {useAuthorizationContext, useProjectsValue} from '../context';
+import {TodoistApi} from "../api/TodoistApi";
 
 export const AddProject = ({ shouldShow = false }) => {
   const [show, setShow] = useState(shouldShow);
   const [projectName, setProjectName] = useState('');
   const { projects, setProjects } = useProjectsValue();
+  const {userCredentials, clearCredentials} = useAuthorizationContext();
 
   const addProject = () => {
-    todoistAPI.addNewProject({'title': projectName}).then(() => {
-      setProjects([...projects]);
+    TodoistApi.createProject(JSON.stringify({'title': projectName}), userCredentials.token).then((response) => {
+      const projects = response.data;
+      setProjects([...projects.projects]);
       setProjectName('');
       setShow(false);
     })

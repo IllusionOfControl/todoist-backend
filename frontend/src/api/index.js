@@ -1,16 +1,15 @@
 import axios from "axios"
 
 
-const API_URL = 'http://192.168.24.64:8000'
+const API_URL = 'http://localhost:8000/api'
 
 
 const todoistAPI = {
-
     getProjectTasks: async (task_key) => {
         return await axios({
             method: 'GET',
             url: `${API_URL}/projects/${task_key}/tasks`,
-            headers: { 'Authorization': 'Token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NjA3NTY1ODgsInN1YiI6ImFjY2VzcyJ9._EfD0m_peFl0dRupDKLx1W8NPwJAu3MX-y3YB8ku9gs' }
+            headers: { 'Authorization': 'Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NzQ5Nzc2NTEsInN1YiI6ImFjY2VzcyJ9.UN625pGDHKgiKQIsPpnpPw67-S5h3skI9BFVi1ncljg' }
         }).catch(error => {
             if (error.response) {
                 return error.response.data
@@ -22,7 +21,7 @@ const todoistAPI = {
         return await axios({
             method: 'GET',
             url: `${API_URL}/projects`,
-            headers: { 'Authorization': 'Token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NjA3NTY1ODgsInN1YiI6ImFjY2VzcyJ9._EfD0m_peFl0dRupDKLx1W8NPwJAu3MX-y3YB8ku9gs' }
+            headers: { 'Authorization': 'Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NzQ5Nzc2NTEsInN1YiI6ImFjY2VzcyJ9.UN625pGDHKgiKQIsPpnpPw67-S5h3skI9BFVi1ncljg' }
         }).catch(error => {
             if (error.response) {
                 return error.response.data
@@ -31,10 +30,9 @@ const todoistAPI = {
     },
 
     getCollatedTasks: async (collated_key) => {
-        return await axios({
-            method: 'GET',
+        return await axios({            method: 'GET',
             url: `${API_URL}/collated/${collated_key.toLowerCase()}`,
-            headers: { 'Authorization': 'Token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NjA3NTY1ODgsInN1YiI6ImFjY2VzcyJ9._EfD0m_peFl0dRupDKLx1W8NPwJAu3MX-y3YB8ku9gs' }
+            headers: { 'Authorization': 'Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NzQ5Nzc2NTEsInN1YiI6ImFjY2VzcyJ9.UN625pGDHKgiKQIsPpnpPw67-S5h3skI9BFVi1ncljg' }
         }).catch(error => {
             if (error.response) {
                 return error.response.data
@@ -46,7 +44,7 @@ const todoistAPI = {
         return await axios({
             method: 'POST',
             url: `${API_URL}/projects`,
-            headers: { 'Authorization': 'Token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NjA3NTY1ODgsInN1YiI6ImFjY2VzcyJ9._EfD0m_peFl0dRupDKLx1W8NPwJAu3MX-y3YB8ku9gs' },
+            headers: { 'Authorization': 'Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NzQ5Nzc2NTEsInN1YiI6ImFjY2VzcyJ9.UN625pGDHKgiKQIsPpnpPw67-S5h3skI9BFVi1ncljg' },
             data: new_project_data
         }).catch(error => {
             if (error.response) {
@@ -59,7 +57,7 @@ const todoistAPI = {
         return await axios({
             method: 'DELETE',
             url: `${API_URL}/projects`,
-            headers: { 'Authorization': 'Token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NjA3NTY1ODgsInN1YiI6ImFjY2VzcyJ9._EfD0m_peFl0dRupDKLx1W8NPwJAu3MX-y3YB8ku9gs' }
+            headers: { 'Authorization': 'Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NzQ5Nzc2NTEsInN1YiI6ImFjY2VzcyJ9.UN625pGDHKgiKQIsPpnpPw67-S5h3skI9BFVi1ncljg' }
         }).catch(error => {
             if (error.response) {
                 return error.response.data
@@ -71,10 +69,10 @@ const todoistAPI = {
         return await axios({
             method: 'POST',
             url: `${API_URL}/projects/${project_id}/tasks/`,
-            headers: { 'Authorization': 'Token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NjA3NTY1ODgsInN1YiI6ImFjY2VzcyJ9._EfD0m_peFl0dRupDKLx1W8NPwJAu3MX-y3YB8ku9gs' },
+            headers: { 'Authorization': 'Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NzQ5Nzc2NTEsInN1YiI6ImFjY2VzcyJ9.UN625pGDHKgiKQIsPpnpPw67-S5h3skI9BFVi1ncljg' },
             data: new_task_data
         }).catch(error => {
-            if (error.response) {
+            if (error.responpse) {
                 return error.response.data
             }
         })
@@ -84,7 +82,7 @@ const todoistAPI = {
         return await axios({
             method: 'GET',
             url: `${API_URL}/collated/${collated_key.toLowerCase()}`,
-            headers: { 'Authorization': 'Token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NjA3NTY1ODgsInN1YiI6ImFjY2VzcyJ9._EfD0m_peFl0dRupDKLx1W8NPwJAu3MX-y3YB8ku9gs' }
+            headers: { 'Authorization': 'Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NzQ5Nzc2NTEsInN1YiI6ImFjY2VzcyJ9.UN625pGDHKgiKQIsPpnpPw67-S5h3skI9BFVi1ncljg' }
         }).catch(error => {
             if (error.response) {
                 return error.response.data
@@ -96,7 +94,7 @@ const todoistAPI = {
         return await axios({
             method: 'GET',
             url: `${API_URL}/projects/${project}`,
-            headers: { 'Authorization': 'Token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NjA3NTY1ODgsInN1YiI6ImFjY2VzcyJ9._EfD0m_peFl0dRupDKLx1W8NPwJAu3MX-y3YB8ku9gs' }
+            headers: { 'Authorization': 'Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJleHAiOjE2NzQ5Nzc2NTEsInN1YiI6ImFjY2VzcyJ9.UN625pGDHKgiKQIsPpnpPw67-S5h3skI9BFVi1ncljg' }
         }).catch(error => {
             if (error.response) {
                 return error.response.data

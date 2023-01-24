@@ -1,27 +1,23 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { Header } from './layout/Header';
-import { Content } from './layout/Content';
-import { ProjectsProvider, SelectedProjectProvider } from './context';
+import {SignInPage, SignUpPage, TodoistPage} from "./pages";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {useEffect} from "react";
+import {useThemeContext} from "./context";
 
-export const App = ({ darkModeDefault = false }) => {
-  const [darkMode, setDarkMode] = useState(darkModeDefault);
+export const App = () => {
+  const {darkMode} = useThemeContext();
+
+  useEffect(() => {
+    if (darkMode) document.body.classList.add('dark');
+    else document.body.classList.remove('dark')
+  }, [darkMode]);
 
   return (
-    <SelectedProjectProvider>
-      <ProjectsProvider>
-        <main
-          data-testid="application"
-          className={darkMode ? 'darkmode' : undefined}
-        >
-          <Header darkMode={darkMode} setDarkMode={setDarkMode} />
-          <Content />
-        </main>
-      </ProjectsProvider>
-    </SelectedProjectProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<TodoistPage/>}/>
+        <Route path="/login" element={<SignInPage/>}/>
+        <Route path="/registration" element={<SignUpPage/>}/>
+      </Routes>
+    </BrowserRouter>
   );
-};
-
-App.propTypes = {
-  darkModeDefault: PropTypes.bool,
 };

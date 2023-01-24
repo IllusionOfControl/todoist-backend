@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { FaPizzaSlice } from 'react-icons/fa';
-import PropTypes from 'prop-types';
-import { AddTask } from '../components/AddTask';
+// import { AddTask } from '../components/AddTask';
+import {useThemeContext} from "../context";
 
-export const Header = ({ darkMode, setDarkMode }) => {
+export const Header = () => {
   const [shouldShowMain, setShouldShowMain] = useState(false);
   const [showQuickAddTask, setShowQuickAddTask] = useState(false);
+  const {switchThemeMode} = useThemeContext();
 
   return (
     <header className="header" data-testid="header">
@@ -33,7 +34,7 @@ export const Header = ({ darkMode, setDarkMode }) => {
                 data-testid="dark-mode-action"
                 aria-label="Darkmode on/off"
                 type="button"
-                onClick={() => setDarkMode(!darkMode)}
+                onClick={switchThemeMode}
               >
                 <FaPizzaSlice />
               </button>
@@ -42,17 +43,12 @@ export const Header = ({ darkMode, setDarkMode }) => {
         </div>
       </nav>
 
-      <AddTask
-        showAddTaskMain={false}
-        shouldShowMain={shouldShowMain}
-        showQuickAddTask={showQuickAddTask}
-        setShowQuickAddTask={setShowQuickAddTask}
-      />
+      {/*<AddTask*/}
+      {/*  showAddTaskMain={false}*/}
+      {/*  shouldShowMain={shouldShowMain}*/}
+      {/*  showQuickAddTask={showQuickAddTask}*/}
+      {/*  setShowQuickAddTask={setShowQuickAddTask}*/}
+      {/*/>*/}
     </header>
   );
-};
-
-Header.propTypes = {
-  darkMode: PropTypes.bool.isRequired,
-  setDarkMode: PropTypes.func.isRequired,
 };

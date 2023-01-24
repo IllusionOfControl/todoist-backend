@@ -1,6 +1,14 @@
 import React from 'react';
-import { render } from 'react-dom';
-import { App } from './App';
+import {render} from 'react-dom';
+import {App} from './App';
+import {AuthorizationProvider, ThemeProvider} from "./context";
 import './App.scss';
 
-render(<App />, document.getElementById('root'));
+render(
+  <ThemeProvider>
+    <AuthorizationProvider>
+      <App/>
+    </AuthorizationProvider>
+  </ThemeProvider>,
+  document.getElementById('root')
+);

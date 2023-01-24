@@ -10,6 +10,18 @@ import {
   useSelectedProjectValue,
 } from './selected-project-context';
 
+import {
+  AuthorizationContext,
+  AuthorizationProvider,
+  useAuthorizationContext,
+} from "./authorization-context";
+
+import {
+  ThemeContext,
+  ThemeProvider,
+  useThemeContext,
+} from "./theme-context";
+
 export {
   ProjectsContext,
   ProjectsProvider,
@@ -17,4 +29,10 @@ export {
   SelectedProjectContext,
   SelectedProjectProvider,
   useSelectedProjectValue,
+  AuthorizationContext,
+  AuthorizationProvider,
+  useAuthorizationContext,
+  ThemeContext,
+  ThemeProvider,
+  useThemeContext,
 };

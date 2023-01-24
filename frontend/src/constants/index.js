@@ -6,7 +6,7 @@ import {
 
 
 export const collatedTasks = [
-  { key: 'INBOX', name: 'Inbox', icon: FaInbox },
-  { key: 'TODAY', name: 'Today', icon: FaRegCalendarAlt },
-  { key: 'NEXT_7', name: 'Next 7 Days', icon: FaRegCalendar },
+  { key: 'inbox', name: 'Inbox', icon: FaInbox },
+  { key: 'today', name: 'Today', icon: FaRegCalendarAlt },
+  { key: 'next7', name: 'Next 7 Days', icon: FaRegCalendar },
 ];

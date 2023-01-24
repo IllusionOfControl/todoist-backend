@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { FaRegListAlt, FaRegCalendarAlt } from 'react-icons/fa';
-import PropTypes from 'prop-types';
-import { useSelectedProjectValue } from '../context';
+import {useAuthorizationContext, useSelectedProjectValue} from '../context';
 import { ProjectOverlay } from './ProjectOverlay';
 import { TaskDate } from './TaskDate';
-import { todoistAPI } from '../api';
+import {TodoistApi} from "../api/TodoistApi";
 
 export const AddTask = ({
   showAddTaskMain = true,
@@ -19,6 +18,7 @@ export const AddTask = ({
   const [showProjectOverlay, setShowProjectOverlay] = useState(false);
   const [showTaskDate, setShowTaskDate] = useState(false);
 
+  const {userCredentials} = useAuthorizationContext();
   const { selectedProject } = useSelectedProjectValue();
 
   const addTask = () => {
@@ -27,8 +27,11 @@ export const AddTask = ({
     return (
       task &&
       projectId &&
-      todoistAPI.addNewTask(projectId, {title: 'task'})
-      .then(() => {
+      TodoistApi.createTask(
+        projectId,
+        JSON.stringify({title: task}),
+        userCredentials.token,
+      ).then(() => {
         setTask('');
         setProject('');
         setShowMain('');
@@ -168,11 +171,4 @@ export const AddTask = ({
       )}
     </div>
   );
-};
-
-AddTask.propTypes = {
-  showAddTaskMain: PropTypes.bool,
-  shouldShowMain: PropTypes.bool,
-  showQuickAddTask: PropTypes.bool,
-  setShowQuickAddTask: PropTypes.func,
 };

@@ -1,18 +1,11 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-
-export const Checkbox = ({ id, taskDesc }) => {
-  const archiveTask = () => {
-
-  };
-
+export const Checkbox = ({ id, taskDesc, onCheck }) => {
   return (
     <div
       className="checkbox-holder"
       data-testid="checkbox-action"
-      onClick={() => archiveTask()}
+      onClick={() => onCheck(id)}
       onKeyDown={(e) => {
-        if (e.key === 'Enter') archiveTask();
+        if (e.key === 'Enter') onCheck(id);
       }}
       aria-label={`Mark ${taskDesc} as done?`}
       role="button"
@@ -21,9 +14,4 @@ export const Checkbox = ({ id, taskDesc }) => {
       <span className="checkbox" />
     </div>
   );
-};
-
-Checkbox.propTypes = {
-  id: PropTypes.string.isRequired,
-  taskDesc: PropTypes.string.isRequired,
 };

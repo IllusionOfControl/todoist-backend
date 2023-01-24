@@ -16,14 +16,14 @@ router = APIRouter()
 @router.post(
     "",
     status_code=status.HTTP_201_CREATED,
-    response_model=ProjectInResponse,
+    response_model=ListOfProjectsInResponse,
     name="projects:create-project"
 )
 async def create_new_project(
     project_create: ProjectInCreate = Body(...),
     project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository)),
     user: UserDomain = Depends(get_current_user_authorizer())
-) -> ProjectInResponse:
+) -> ListOfProjectsInResponse:
     try:
         if await project_repo.get_project_by_title(title=project_create.title):
             raise HTTPException(
@@ -33,9 +33,20 @@ async def create_new_project(
     except EntityDoesNotExist:
         pass
 
-    project = await project_repo.create_project(title=project_create.title, owner_id=user.id)
+    # project = await project_repo.create_project(title=project_create.title, owner_id=user.id)
+    #
+    # return ProjectInResponse(**project.dict())
 
-    return ProjectInResponse(**project.dict())
+    projects = await project_repo.get_all_projects_by_owner_id(owner_id=user.id)
+
+    projects_for_response = [
+        ProjectInResponse(**project.dict()) for project in projects
+    ]
+
+    return ListOfProjectsInResponse(
+        projects=projects_for_response,
+        count=len(projects_for_response)
+    )
 
 
 @router.get(

@@ -48,7 +48,7 @@ def upgrade() -> None:
     sa.Column('created_at', postgresql.TIMESTAMP(), server_default=sa.text("'2022-08-10 15:38:18.081553'::timestamp without time zone"), autoincrement=False, nullable=True),
     sa.Column('updated_at', postgresql.TIMESTAMP(), server_default=sa.text("'2022-08-10 15:38:18.081553'::timestamp without time zone"), autoincrement=False, nullable=True),
     sa.Column('scheduled_at', sa.DATE(), autoincrement=False, nullable=True),
-    sa.ForeignKeyConstraint(['project_id'], ['projects.id'], name='tasks_project_id_fkey'),
+    sa.ForeignKeyConstraint(['project_id'], ['projects.id'], name='tasks_project_id_fkey', ondelete="CASCADE"),
     sa.PrimaryKeyConstraint('id', name='tasks_pkey')
     )
     # ### end Alembic commands ###

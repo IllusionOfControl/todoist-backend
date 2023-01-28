@@ -8,6 +8,7 @@ from app.api.dependencies.tasks import get_task_by_id_from_path
 from app.api.dependencies.authentication import get_current_user_authorizer
 from app.models.domains.projects import ProjectDomain
 from app.api.dependencies.database import get_repository
+from fastapi.security.http import HTTPBase
 
 router = APIRouter()
 

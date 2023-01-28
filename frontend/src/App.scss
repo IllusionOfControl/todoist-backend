@@ -43,7 +43,7 @@
      position: absolute;
      width: 100%;
      z-index: 1;
-     top: 85px;
+     //top: 85px;
      border-radius: 3px;
    }
    
@@ -419,14 +419,14 @@
    /* Show Confirm Delete
      ============================================ */
    .project-delete-modal {
-     position: relative;
+     //position: relative;
    
      &__inner {
        @include box-overlay();
        z-index: 99;
        width: 200px;
        padding: 10px;
-       top: 10px;
+       //top: 10px;
        right: 0;
        background-color: white;
    

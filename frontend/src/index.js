@@ -5,10 +5,12 @@ import {AuthorizationProvider, ThemeProvider} from "./context";
 import './App.scss';
 
 render(
-  <ThemeProvider>
-    <AuthorizationProvider>
-      <App/>
-    </AuthorizationProvider>
-  </ThemeProvider>,
+  <React.StrictMode>
+    <ThemeProvider>
+      <AuthorizationProvider>
+        <App/>
+      </AuthorizationProvider>
+    </ThemeProvider>
+  </React.StrictMode>,
   document.getElementById('root')
 );

@@ -10,11 +10,11 @@ export const AuthorizationApi = {
     });
   },
 
-  signup: async (username, password) => {
+  signup: async (username, email, password) => {
     return await api.request({
       url: `/auth/signup/`,
       method: "POST",
-      data: {"username": username, "password": password},
+      data: {"username": username, "email": email, "password": password},
     })
   }
 }

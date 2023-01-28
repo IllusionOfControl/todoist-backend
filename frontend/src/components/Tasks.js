@@ -10,8 +10,8 @@ import {TodoistApi} from "../api/TodoistApi";
 export const Tasks = () => {
   const { selectedProject } = useSelectedProjectValue();
   const { projects } = useProjectsValue();
-  const { tasks } = useTasks(selectedProject);
-  const {userCredentials} = useAuthorizationContext();
+  const { tasks, setTasks } = useTasks(selectedProject);
+  const { token } = useAuthorizationContext();
 
   let projectName = '';
 
@@ -33,7 +33,14 @@ export const Tasks = () => {
   });
 
   const handleCheck = (id) => {
-    TodoistApi.removeTask(selectedProject, id, userCredentials.token);
+    TodoistApi.removeTask(selectedProject, id, token).then(r => {
+      if (r.status === 204)
+        setTasks(tasks.filter((item) => {return item.id !== id}));
+    });
+  }
+
+  const handleCreate = (task) => {
+    setTasks([...tasks, task]);
   }
 
   return (
@@ -49,7 +56,7 @@ export const Tasks = () => {
         ))}
       </ul>
 
-      <AddTask />
+      <AddTask onCreate={handleCreate}/>
     </div>
   );
 };

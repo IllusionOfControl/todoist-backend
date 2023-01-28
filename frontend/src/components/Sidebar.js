@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import {
   FaChevronDown,
 } from 'react-icons/fa';
-import { Projects } from '../components/Projects';
+import { Projects } from './Projects';
 import { useSelectedProjectValue } from '../context';
-import { AddProject } from '../components/AddProject';
-import { CollatedTasksList } from '../components/CollatedTasksList'
+import { AddProject } from './AddProject';
+import { CollatedTasksList } from './CollatedTasksList'
 
 export const Sidebar = () => {
   const { setSelectedProject } = useSelectedProjectValue();

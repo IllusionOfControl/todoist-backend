@@ -1,9 +1,9 @@
-import { TodoistPage } from "./TodoistPage";
+import { MainPage } from "./MainPage";
 import { SignInPage } from "./SignInPage";
 import { SignUpPage } from "./SignUpPage";
 
 export {
-  TodoistPage,
+  MainPage,
   SignInPage,
   SignUpPage,
 }

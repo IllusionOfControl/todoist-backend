@@ -7,12 +7,12 @@ export const AddProject = ({ shouldShow = false }) => {
   const [show, setShow] = useState(shouldShow);
   const [projectName, setProjectName] = useState('');
   const { projects, setProjects } = useProjectsValue();
-  const {userCredentials, clearCredentials} = useAuthorizationContext();
+  const {token, resetCredentials} = useAuthorizationContext();
 
   const addProject = () => {
-    TodoistApi.createProject(JSON.stringify({'title': projectName}), userCredentials.token).then((response) => {
-      const projects = response.data;
-      setProjects([...projects.projects]);
+    TodoistApi.createProject(JSON.stringify({'title': projectName}), token).then((response) => {
+      const project = response.data;
+      setProjects([...projects, project]);
       setProjectName('');
       setShow(false);
     })

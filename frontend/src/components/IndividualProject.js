@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
-import PropTypes from 'prop-types';
-import { useProjectsValue, useSelectedProjectValue } from '../context';
-import { todoistAPI } from '../api'
+import {useAuthorizationContext, useProjectsValue, useSelectedProjectValue} from '../context';
+import {TodoistApi} from "../api/TodoistApi";
 
 export const IndividualProject = ({ project }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const { projects, setProjects } = useProjectsValue();
   const { setSelectedProject } = useSelectedProjectValue();
+  const { token } = useAuthorizationContext();
 
   const deleteProject = (project_id) => {
-    todoistAPI.deleteProject(project_id).then(() => {
-      setProjects([...projects]);
+    TodoistApi.removeProject(project_id, token).then(() => {
+      setProjects([...projects.filter((item) => {return item.id !== project_id;})]);
       setSelectedProject('INBOX');
     })
   };
@@ -59,8 +59,4 @@ export const IndividualProject = ({ project }) => {
       </span>
     </>
   );
-};
-
-IndividualProject.propTypes = {
-  project: PropTypes.object.isRequired,
 };

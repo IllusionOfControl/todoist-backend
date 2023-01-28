@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaPizzaSlice } from 'react-icons/fa';
-// import { AddTask } from '../components/AddTask';
+import { AddTask } from '../components/AddTask';
 import {useThemeContext} from "../context";
 
 export const Header = () => {
@@ -43,12 +43,12 @@ export const Header = () => {
         </div>
       </nav>
 
-      {/*<AddTask*/}
-      {/*  showAddTaskMain={false}*/}
-      {/*  shouldShowMain={shouldShowMain}*/}
-      {/*  showQuickAddTask={showQuickAddTask}*/}
-      {/*  setShowQuickAddTask={setShowQuickAddTask}*/}
-      {/*/>*/}
+      <AddTask
+        showAddTaskMain={false}
+        shouldShowMain={shouldShowMain}
+        showQuickAddTask={showQuickAddTask}
+        setShowQuickAddTask={setShowQuickAddTask}
+      />
     </header>
   );
 };

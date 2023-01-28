@@ -1,4 +1,4 @@
-import {SignInPage, SignUpPage, TodoistPage} from "./pages";
+import {SignInPage, SignUpPage, MainPage} from "./pages";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {useEffect} from "react";
 import {useThemeContext} from "./context";
@@ -14,7 +14,7 @@ export const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<TodoistPage/>}/>
+        <Route path="/" element={<MainPage/>}/>
         <Route path="/login" element={<SignInPage/>}/>
         <Route path="/registration" element={<SignUpPage/>}/>
       </Routes>

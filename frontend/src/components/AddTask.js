@@ -8,6 +8,7 @@ import {TodoistApi} from "../api/TodoistApi";
 export const AddTask = ({
   showAddTaskMain = true,
   shouldShowMain = false,
+  onCreate,
   showQuickAddTask,
   setShowQuickAddTask,
 }) => {
@@ -17,8 +18,7 @@ export const AddTask = ({
   const [showMain, setShowMain] = useState(shouldShowMain);
   const [showProjectOverlay, setShowProjectOverlay] = useState(false);
   const [showTaskDate, setShowTaskDate] = useState(false);
-
-  const {userCredentials} = useAuthorizationContext();
+  const { token } = useAuthorizationContext();
   const { selectedProject } = useSelectedProjectValue();
 
   const addTask = () => {
@@ -30,8 +30,9 @@ export const AddTask = ({
       TodoistApi.createTask(
         projectId,
         JSON.stringify({title: task}),
-        userCredentials.token,
+        token,
       ).then(() => {
+        onCreate(task);
         setTask('');
         setProject('');
         setShowMain('');

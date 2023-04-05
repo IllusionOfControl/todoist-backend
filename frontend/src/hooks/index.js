@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import {collatedTasksExist} from '../helpers';
 import {TodoistApi} from "../api/TodoistApi";
-import {useAuthorizationContext} from "../context/authorization-context";
+import {useAuthorizationContext} from "../context";
 
 export const useTasks = selectedProject => {
   const [tasks, setTasks] = useState([]);
@@ -19,7 +19,7 @@ export const useTasks = selectedProject => {
         setTasks(recieved_tasks);
       }
     }, [tasks]).catch((error) => {
-      if (error.response.status === 401) {
+      if (error.response.status === 403) {
         resetCredentials();
       }
     });
@@ -39,7 +39,7 @@ export const useProjects = () => {
         setProjects(received_projects);
       }
     }).catch((error) => {
-      if (error.response.status === 401) {
+      if (error.response.status === 403) {
         resetCredentials();
       }
     });

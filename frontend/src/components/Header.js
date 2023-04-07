@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaPizzaSlice } from 'react-icons/fa';
-import { AddTask } from '../components/AddTask';
+import { AddTask } from './AddTask';
 import {useThemeContext} from "../context";
 
 export const Header = () => {

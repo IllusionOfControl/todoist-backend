@@ -1,4 +1,4 @@
-import {Header} from '../layout/Header';
+import {Header} from '../components/Header';
 import {
   ProjectsProvider,
   SelectedProjectProvider,

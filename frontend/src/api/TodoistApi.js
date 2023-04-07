@@ -4,7 +4,7 @@ import {api} from "./conifgs/axiosConfig";
 export const TodoistApi = {
   getAllProjects: async (token) => {
     return await api.request({
-      url: `/projects/`,
+      url: `/projects`,
       method: "GET",
       headers: {"Authorization": `Token ${token}`},
     })
@@ -20,7 +20,7 @@ export const TodoistApi = {
 
   createProject: async (data, token) => {
     return await api.request({
-      url: `/projects/`,
+      url: `/projects`,
       method: "POST",
       data: data,
       headers: {"Authorization": `Token ${token}`},

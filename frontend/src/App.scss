@@ -197,6 +197,10 @@
            ul {
              float: right;
            }
+
+           ul > * + * {
+             margin-left: 8px;
+           }
    
            ul li {
              @include va;
@@ -217,15 +221,9 @@
              &.settings__add {
                margin-right: 15px;
                font-size: 30px;
-   
-               button {
-                 @include transparent-button();
-                 color: white;
-                 cursor: pointer;
-               }
              }
    
-             &.settings__darkmode {
+             &.settings__item {
                button {
                  @include transparent-button();
                  color: white;
@@ -239,7 +237,6 @@
                    height: 20px;
                  }
                }
-   
              }
            }
          }

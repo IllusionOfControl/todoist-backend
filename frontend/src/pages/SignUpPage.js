@@ -1,41 +1,49 @@
 import React, { useState } from 'react';
 import {Link, useNavigate} from "react-router-dom";
 import {useAuthorizationContext} from "../context";
+import {useInput} from "../hooks";
 
+const defaultValidate = (value) => {
+  return value.length <= 3;
+}
+
+const emailValidate = (value) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return !emailRegex.test(value);
+}
 
 export const SignUpPage = () => {
-  const [username, setUsername] = useState();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [username, usernameHandle, usernameError] = useInput("", defaultValidate)
+  const [email, emailHandle, emailError] = useInput("", emailValidate)
+  const [password, passwordHandle, passwordError] = useInput("",  defaultValidate)
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const auth = useAuthorizationContext();
 
   const handleSubmit = (event) => {
-    auth.signUp(username, email, password).then(() => navigate("/")).catch((error) => {
-      if (error.response) {
-        setError(error.response.data.detail);
-      }
-    })
-    event.preventDefault();
+    if (!(usernameError || passwordError)) {
+      auth.signUp(username, email, password).then(() => {navigate("/")}).catch((error) => {
+        if (error.response) {
+          setError(error.response.data.detail);
+        }
+      })
+      event.preventDefault();
+    }
   }
 
   return (
-    <section className="login">
-      <h2 className="title">Sign up Page</h2>
+    <section className="auth-section">
       <form onSubmit={handleSubmit}>
-        { error ? <h3>{error}</h3> : ""}
-
+        <h2>Sign up Page</h2>
         <label htmlFor="username">username</label>
-        <input type="text" onChange={(e) => setUsername(e.target.value)}/>
-        <label htmlFor="password">email</label>
-        <input type="text" onChange={(e) => setEmail(e.target.value)}/>
+        <input className={usernameError && "invalid"} type="text" onChange={usernameHandle}/>
+        <label htmlFor="username">email</label>
+        <input className={emailError && "invalid"} type="email" onChange={emailHandle}/>
         <label htmlFor="password">password</label>
-        <input type="text" onChange={(e) => setPassword(e.target.value)}/>
+        <input className={passwordError && "invalid"} type="password" onChange={passwordHandle}/>
+        { error ? <h3>{error}</h3> : ""}
         <button className="#">Registration</button>
         <div>
-          <a href="#" target="_blank" rel="noopener">Forgot password</a>
-          <span>/</span>
           <Link to={"/login"}>Sign in</Link>
         </div>
       </form>

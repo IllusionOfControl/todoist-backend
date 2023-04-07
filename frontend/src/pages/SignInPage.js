@@ -1,39 +1,42 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link, useNavigate} from "react-router-dom";
-// import style from "./login.css"
 import {useAuthorizationContext} from "../context";
+import {useInput} from "../hooks"
 
+
+const defaultValidate = (value) => {
+  return value.length <= 3;
+}
 
 export const SignInPage = () => {
-  const [username, setUsername] = useState();
-  const [password, setPassword] = useState();
+  const [username, usernameHandle, usernameError] = useInput("", defaultValidate)
+  const [password, passwordHandle, passwordError] = useInput("",  defaultValidate)
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const auth = useAuthorizationContext();
 
   const handleSubmit = (event) => {
-    auth.signIn(username, password).then(() => navigate("/")).catch((error) => {
-      if (error.response) {
-        setError(error.response.data.detail);
-      }
-    })
+    if (!(usernameError || passwordError)) {
+      auth.signIn(username, password).then(() => {navigate("/")}).catch((error) => {
+        if (error.response) {
+          setError(error.response.data.detail);
+        }
+      })
+    }
     event.preventDefault();
   }
 
   return (
-    <section className="login">
-      <h2 className="title">Log-in Page</h2>
+    <section className="auth-section">
       <form onSubmit={handleSubmit}>
-        { error ? <h3>{error}</h3> : ""}
-
+        <h2>Log-in Page</h2>
         <label htmlFor="username">username</label>
-        <input type="text" onChange={(e) => setUsername(e.target.value)}/>
+        <input className={usernameError ? "invalid": ""} type="text" onChange={usernameHandle}/>
         <label htmlFor="password">password</label>
-        <input type="text" onChange={(e) => setPassword(e.target.value)}/>
+        <input className={passwordError ? "invalid": ""} type="password" onChange={passwordHandle}/>
+        { error && <p>{error}</p>}
         <button className="#">login</button>
         <div>
-          <a href="#" target="_blank" rel="noopener">Forgot password</a>
-          <span>/</span>
           <Link to={"/registration"}>Sign up</Link>
         </div>
       </form>

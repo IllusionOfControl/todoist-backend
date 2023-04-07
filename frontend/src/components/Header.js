@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { FaPizzaSlice } from 'react-icons/fa';
+import { FaPizzaSlice, FaSignOutAlt, FaPlus } from 'react-icons/fa';
 import { AddTask } from './AddTask';
-import {useThemeContext} from "../context";
+import {useAuthorizationContext, useThemeContext} from "../context";
 
 export const Header = () => {
   const [shouldShowMain, setShouldShowMain] = useState(false);
   const [showQuickAddTask, setShowQuickAddTask] = useState(false);
   const {switchThemeMode} = useThemeContext();
+  const {resetCredentials} = useAuthorizationContext()
 
   return (
     <header className="header" data-testid="header">
@@ -16,7 +17,7 @@ export const Header = () => {
         </div>
         <div className="settings">
           <ul>
-            <li className="settings__add">
+            <li className="settings__item">
               <button
                 data-testid="quick-add-task-action"
                 aria-label="Quick add task"
@@ -26,10 +27,10 @@ export const Header = () => {
                   setShouldShowMain(true);
                 }}
               >
-                +
+                <FaPlus />
               </button>
             </li>
-            <li className="settings__darkmode">
+            <li className="settings__item">
               <button
                 data-testid="dark-mode-action"
                 aria-label="Darkmode on/off"
@@ -37,6 +38,16 @@ export const Header = () => {
                 onClick={switchThemeMode}
               >
                 <FaPizzaSlice />
+              </button>
+            </li>
+            <li className="settings__item">
+              <button
+                data-testid="dark-mode-action"
+                aria-label="Darkmode on/off"
+                type="button"
+                onClick={resetCredentials}
+              >
+                <FaSignOutAlt />
               </button>
             </li>
           </ul>

@@ -47,3 +47,16 @@ export const useProjects = () => {
 
   return {projects, setProjects};
 };
+
+export const useInput = (initialValue, validatorCallback = f => f) => {
+  const [value, setValue] = useState(initialValue);
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    const inputValue = e.target.value;
+    setValue(inputValue);
+    setError(validatorCallback(inputValue));
+  };
+
+  return [value, handleChange, error];
+};

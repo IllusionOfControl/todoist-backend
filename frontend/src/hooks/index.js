@@ -3,27 +3,27 @@ import {collatedTasksExist} from '../helpers';
 import {TodoistApi} from "../api/TodoistApi";
 import {useAuthorizationContext} from "../context";
 
-export const useTasks = selectedProject => {
+export const useTasks = project => {
   const [tasks, setTasks] = useState([]);
   const {token, resetCredentials} = useAuthorizationContext();
 
   useEffect(() => {
-    let api_call
-    if (collatedTasksExist(selectedProject))
-      api_call = TodoistApi.getCollatedTasks
-    else api_call = TodoistApi.getProjectTasks;
+    let apiCall
+    if (collatedTasksExist(project))
+      apiCall = TodoistApi.getCollatedTasks
+    else apiCall = TodoistApi.getProjectTasks;
 
-    api_call(selectedProject, token).then((response) => {
-      const recieved_tasks = response.data.tasks;
-      if (JSON.stringify(recieved_tasks) !== JSON.stringify(tasks)) {
-        setTasks(recieved_tasks);
+    apiCall(project, token).then((response) => {
+      const recievedTasks = response.data.tasks;
+      if (JSON.stringify(recievedTasks) !== JSON.stringify(tasks)) {
+        setTasks(recievedTasks);
       }
     }, [tasks]).catch((error) => {
       if (error.response.status === 403) {
         resetCredentials();
       }
     });
-  })
+  }, [resetCredentials, project, token])
 
   return {tasks, setTasks};
 };
@@ -43,7 +43,7 @@ export const useProjects = () => {
         resetCredentials();
       }
     });
-  }, [projects]);
+  }, [resetCredentials, token]);
 
   return {projects, setProjects};
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import {useState} from 'react';
 import {Link, useNavigate} from "react-router-dom";
 import {useAuthorizationContext} from "../context";
 import {useInput} from "../hooks";
@@ -32,21 +32,31 @@ export const SignUpPage = () => {
   }
 
   return (
-    <section className="auth-section">
-      <form onSubmit={handleSubmit}>
-        <h2>Sign up Page</h2>
-        <label htmlFor="username">username</label>
-        <input className={usernameError && "invalid"} type="text" onChange={usernameHandle}/>
-        <label htmlFor="username">email</label>
-        <input className={emailError && "invalid"} type="email" onChange={emailHandle}/>
-        <label htmlFor="password">password</label>
-        <input className={passwordError && "invalid"} type="password" onChange={passwordHandle}/>
-        { error ? <h3>{error}</h3> : ""}
-        <button className="#">Registration</button>
-        <div>
-          <Link to={"/login"}>Sign in</Link>
-        </div>
-      </form>
-    </section>
+    <>
+      <header className="header" data-testid="header">
+        <nav>
+          <div className="logo">
+            <img src="/images/logo.png" alt="Todoist" />
+          </div>
+        </nav>
+      </header>
+
+      <section className="auth-section">
+        <form onSubmit={handleSubmit}>
+          <h2>Sign up Page</h2>
+          <label htmlFor="username">username</label>
+          <input className={usernameError && "invalid"} type="text" onChange={usernameHandle}/>
+          <label htmlFor="username">email</label>
+          <input className={emailError && "invalid"} type="email" onChange={emailHandle}/>
+          <label htmlFor="password">password</label>
+          <input className={passwordError && "invalid"} type="password" onChange={passwordHandle}/>
+          { error ? <h3>{error}</h3> : ""}
+          <button className="#">Registration</button>
+          <div>
+            <Link to={"/login"}>Sign in</Link>
+          </div>
+        </form>
+      </section>
+    </>
   );
 };

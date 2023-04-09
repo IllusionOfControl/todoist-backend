@@ -4,7 +4,7 @@ import {api} from "./conifgs/axiosConfig";
 export const AuthorizationApi = {
   signin: async (username, password) => {
     return await api.request({
-      url: `/auth/signin/`,
+      url: `/auth/signin`,
       method: "POST",
       data: {username: username, password: password},
     });
@@ -12,7 +12,7 @@ export const AuthorizationApi = {
 
   signup: async (username, email, password) => {
     return await api.request({
-      url: `/auth/signup/`,
+      url: `/auth/signup`,
       method: "POST",
       data: {"username": username, "email": email, "password": password},
     })

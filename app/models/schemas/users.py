@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, validator, Field
 
 
 class UserInSignup(BaseModel):
-    username: str
-    email: str
-    password: str
+    username: str = Field(title="username", description="user username", min_length=3, max_length=64)
+    email: EmailStr = Field(title="email", description="user email")
+    password: str = Field(title="password", description="user password", min_length=6)
 
 
 class UserInSignin(BaseModel):

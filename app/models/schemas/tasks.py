@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import date
 from typing import Optional, List
 
@@ -6,8 +6,8 @@ from typing import Optional, List
 class TaskInResponse(BaseModel):
     id: str
     project_id: int
-    title: str
-    is_finished: bool
+    title: str = Field(title="Task title")
+    is_finished: bool = Field(default=False, title="Is finished")
     scheduled_at: Optional[date] = ""
 
 

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 
-const BASE_URL = "http://localhost:8000/api"
+const BASE_URL = process.env.REACT_APP_API_ENDPOINT || '/api/'
 
 export const api = axios.create({
   withCredentials: true,
@@ -22,3 +22,4 @@ const errorHandler = error => {
 api.interceptors.response.use(undefined, (error) => {
   return errorHandler(error);
 })
+

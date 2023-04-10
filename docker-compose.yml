@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+  api:
+    build: ./
+    env_file: .env
+    command: /bin/bash -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    depends_on:
+      - db
+    networks:
+      - backend
+      - frontend
+
+  client:
+    build: #./frontend 
+      context: ./frontend
+      args: 
+        API_ENDPOINT: "http://rainbow.vm:8000/api"
+    env_file: .env
+    ports:
+      - 8000:80
+    environment:
+        REACT_APP_API_ENDPOINT: http://rainbow.vm:8000/api
+    volumes:
+      - ./client:/app
+    networks:
+      - frontend
+    depends_on:
+      - db
+      - api
+        
+        #  nginx:
+        #    image: nginx:alpine
+        #    volumes:
+        #  - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        #ports:
+        # - 8000:80
+        #depends_on:
+        # - api
+        # - client
+        # networks:
+        # - frontend
+        # - backend
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: todoist
+      POSTGRES_USER: postgres 
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+volumes:
+  dbdata:
+
+networks:
+  frontend:
+  backend:
+

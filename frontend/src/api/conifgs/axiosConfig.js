@@ -1,11 +1,11 @@
 import axios from "axios";
 
 
-const BASE_URL = process.env.REACT_APP_API_ENDPOINT || '/api/'
+const API_ENDPOINT = process.env.REACT_APP_API_ENDPOINT || 'http://localhost:8000/api/'
 
 export const api = axios.create({
   withCredentials: true,
-  baseURL: BASE_URL,
+  baseURL: API_ENDPOINT,
   headers: {"Content-Type" : "application/json"}
 })
 

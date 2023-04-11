@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useMemo} from 'react';
 import { Checkbox } from './Checkbox';
 import { AddTask } from './AddTask';
 import { useTasks } from '../hooks';
@@ -39,6 +39,12 @@ export const Tasks = () => {
     });
   }
 
+  const isCollated = useMemo(() => {
+    return collatedTasks
+      .filter((item) => selectedProject === item.key)
+      .length !== 0;
+  }, [selectedProject])
+
   const handleCreate = (task) => {
     setTasks([...tasks, task]);
   }
@@ -56,7 +62,7 @@ export const Tasks = () => {
         ))}
       </ul>
 
-      <AddTask onCreate={handleCreate}/>
+      { !isCollated && <AddTask onCreate={handleCreate}/> }
     </div>
   );
 };

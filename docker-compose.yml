@@ -12,7 +12,7 @@ services:
       - frontend
 
   client:
-    build: #./frontend 
+    build:
       context: ./frontend
       args: 
         API_ENDPOINT: "http://rainbow.vm:8000/api"
@@ -22,25 +22,12 @@ services:
     environment:
         REACT_APP_API_ENDPOINT: http://rainbow.vm:8000/api
     volumes:
-      - ./client:/app
+      - ./client:/app~
     networks:
       - frontend
     depends_on:
       - db
       - api
-        
-        #  nginx:
-        #    image: nginx:alpine
-        #    volumes:
-        #  - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-        #ports:
-        # - 8000:80
-        #depends_on:
-        # - api
-        # - client
-        # networks:
-        # - frontend
-        # - backend
 
   db:
     image: postgres

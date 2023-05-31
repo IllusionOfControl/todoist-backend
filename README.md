@@ -101,10 +101,6 @@ docker-compose up --build
 
 6. Access the frontend in your browser at `http://localhost:8000` and the backend API at `http://localhost:8000/api/`.
 
-### Contributing
-
-Contributions are welcome! If you find a bug or have an idea for a new feature, please create a new issue on GitHub or submit a pull request.
-
 ### License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the MIT License.

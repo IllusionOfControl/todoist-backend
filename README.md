@@ -107,5 +107,5 @@ This project is licensed under the MIT License.
 
 ### Screenshots
 
-![](_images\screenshot_1.jpg)
-![](_images\screenshot_2.jpg)
+![](_images/screenshot_1.jpg)
+![](_images/screenshot_2.jpg)

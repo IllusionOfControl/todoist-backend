@@ -1,7 +1,7 @@
 from fastapi import Depends, Request
 from asyncpg import Pool, Connection
 from app.db.repositories.base import BaseRepository
-from typing import Type
+from typing import Type, Annotated
 
 
 async def _get_connection_from_pool(request: Request):
@@ -20,3 +20,6 @@ def get_repository(
         return repo_type(connection)
 
     return _get_repo
+
+
+DbConnectionDep = Annotated[Connection, Depends(_get_connection_from_pool)]

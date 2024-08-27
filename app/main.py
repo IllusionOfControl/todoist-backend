@@ -7,15 +7,15 @@ from app.api.routes.api import router
 
 def get_application() -> FastAPI:
     settings = get_app_settings()
-    settings.configure_logging()
+    settings.logging.configure_logging()
 
     application = FastAPI(
-        **settings.fastapi_kwargs
+        **settings.server.fastapi_kwargs
     )
 
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.allowed_hosts,
+        allow_origins=settings.security.allowed_hosts,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -31,7 +31,7 @@ def get_application() -> FastAPI:
         create_stop_app_handler(application, settings),
     )
 
-    application.include_router(router, prefix=settings.api_prefix)
+    application.include_router(router, prefix=settings.server.api_prefix)
 
     return application
 

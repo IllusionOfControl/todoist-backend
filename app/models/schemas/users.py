@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, validator, Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserInSignup(BaseModel):
@@ -15,6 +15,3 @@ class UserInSignin(BaseModel):
 class UserInResponse(BaseModel):
     username: str
     token: str
-
-    class Config:
-        orm_mode = True

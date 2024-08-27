@@ -4,7 +4,7 @@ from app.models.domains.users import UserDomain
 
 
 class UsersRepository(BaseRepository):
-    async def get_user_by_username(self, *, username: str) -> UserDomain:
+    async def get_user_by_username(self, username: str) -> UserDomain:
         sql = """ 
             SELECT * FROM users WHERE users.username=$1 
         """

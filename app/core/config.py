@@ -2,12 +2,13 @@ from app.core.settings.app import AppSettings
 from app.core.settings.base import AppEnvTypes, BaseAppSettings
 from app.core.settings.development import DevAppSettings
 from functools import lru_cache
-from typing import Dict, Type
+from typing import DefaultDict, Type
+from collections import defaultdict
 
 
-environments: Dict[AppEnvTypes, Type[AppSettings]] = {
+environments: DefaultDict[AppEnvTypes, Type[AppSettings]] = defaultdict(lambda: AppSettings, {
     AppEnvTypes.dev: DevAppSettings,
-}
+})
 
 
 @lru_cache

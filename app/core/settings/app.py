@@ -3,8 +3,7 @@ import sys
 from typing import Any, Dict, List
 
 from loguru import logger
-from pydantic import BaseModel, field_validator
-from pydantic import PostgresDsn
+from pydantic import BaseModel, field_validator, PostgresDsn
 
 from app.core.logging import InterceptHandler
 from app.core.settings.base import BaseAppSettings
@@ -12,6 +11,7 @@ from app.core.settings.base import BaseAppSettings
 
 class ServerSettings(BaseModel):
     debug: bool = False
+    base_url: str = 'localhost'
     docs_url: str = "/docs"
     openapi_prefix: str = ""
     openapi_url: str = "/openapi.json"
@@ -31,10 +31,8 @@ class ServerSettings(BaseModel):
         }
 
 
-class PostgresqlSettings(BaseModel):
+class DatabaseSettings(BaseModel):
     url: PostgresDsn
-    max_connection_count: int = 10
-    min_connection_count: int = 10
 
 
 class SecuritySettings(BaseModel):
@@ -80,7 +78,7 @@ class LoggingSettings(BaseModel):
 
 class AppSettings(BaseAppSettings):
     server: ServerSettings
-    postgresql: PostgresqlSettings
+    database: DatabaseSettings
     security: SecuritySettings
     logging: LoggingSettings = LoggingSettings()
 

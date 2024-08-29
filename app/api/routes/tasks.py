@@ -1,14 +1,13 @@
 from fastapi import APIRouter, Body, Depends, Response
 from starlette import status
-from app.models.schemas.tasks import TaskInResponse, TaskInCreate, ListOfTasksInResponse, TaskInUpdate
-from app.models.domains.tasks import TaskDomain
-from app.db.repositories.tasks import TaskRepository
+from app.schemas import TaskInResponse, TaskInCreate, ListOfTasksInResponse, TaskInUpdate
+from app.models.tasks import TaskDomain
+from app.database.repositories.tasks import TaskRepository
 from app.api.dependencies.projects import get_project_by_id_from_path, check_project_ownership
 from app.api.dependencies.tasks import get_task_by_id_from_path
 from app.api.dependencies.authentication import get_current_user_authorizer
-from app.models.domains.projects import ProjectDomain
+from app.models.projects import ProjectDomain
 from app.api.dependencies.database import get_repository
-from fastapi.security.http import HTTPBase
 
 router = APIRouter()
 

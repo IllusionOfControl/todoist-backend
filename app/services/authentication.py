@@ -1,8 +1,8 @@
 from app.core.exceptions import NotFoundError, AuthError, BadRequestError
-from app.db.errors import EntityDoesNotExist
-from app.db.repositories.users import UsersRepository
-from app.models.schemas.authentication import SignInResponse, SignInRequest, SignUpRequest
+from app.core.secutiry import verify_password
+from app.database.repositories.users import UsersRepository
 from app.resourses import strings
+from app.schemas import SignInResponse, SignInRequest, SignUpRequest
 from app.services.jwt import JWTService
 
 
@@ -12,31 +12,26 @@ class AuthenticationService:
         self._jwt_service = jwt_service
 
     async def check_username_is_taken(self, username: str) -> bool:
-        try:
-            await self._user_repository.get_user_by_username(username=username)
-        except EntityDoesNotExist:
-            return False
-        return True
+        user = await self._user_repository.get_by_username(username=username)
+        return user is not None
 
     async def check_email_is_taken(self, email: str) -> bool:
-        try:
-            await self._user_repository.get_user_by_email(email=email)
-        except EntityDoesNotExist:
-            return False
-        return True
+        user = await self._user_repository.get_by_email(email=email)
+        return user is not None
 
     async def handle_sign_in(self, *, request: SignInRequest) -> SignInResponse:
-        try:
-            user = await self._user_repository.get_user_by_username(request.username)
-        except EntityDoesNotExist as err:
+        user = await self._user_repository.get_by_username(request.username)
+        if user is None:
             raise NotFoundError(f"user with username {request.username} not found")
 
-        if not user.check_password(request.password):
+        if not verify_password(user.password_salt + request.password, user.password_hash):
             raise AuthError("login or password is incorrect")
 
         token = self._jwt_service.create_access_token_for_user(
             user,
         )
+
+        # TODO: Make refresh token
         return SignInResponse(
             username=user.username,
             user_id=str(user.id),
@@ -52,12 +47,13 @@ class AuthenticationService:
         if await self.check_email_is_taken(request.email):
             raise BadRequestError(strings.EMAIL_TAKEN)
 
-        user = await self._user_repository.create_user(
+        user = await self._user_repository.create(
             username=request.username,
             email=request.email,
             password=request.password,
         )
 
+        # TODO: Make refresh token
         token = self._jwt_service.create_access_token_for_user(
             user,
         )

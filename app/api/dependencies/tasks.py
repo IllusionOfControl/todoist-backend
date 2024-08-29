@@ -1,12 +1,7 @@
-from app.models.domains.tasks import TaskDomain
-from app.models.domains.users import UserDomain
-from app.models.domains.projects import ProjectDomain
-from app.db.repositories.tasks import TaskRepository
-from app.db.repositories.projects import ProjectsRepository
-from app.db.errors import EntityDoesNotExist
+from app.models.tasks import TaskDomain
+from app.database.repositories.tasks import TaskRepository
+from app.database.errors import EntityDoesNotExist
 from app.api.dependencies.database import get_repository
-from app.api.dependencies.authentication import get_current_user_authorizer
-from app.api.dependencies.projects import get_project_by_id_from_path
 from app.resourses import strings
 from fastapi import Depends, HTTPException
 from starlette import status

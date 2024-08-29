@@ -1,6 +1,6 @@
-from app.db.repositories.base import BaseRepository
-from app.db.errors import EntityDoesNotExist
-from app.models.domains.projects import ProjectDomain
+from app.database.repositories.base import BaseRepository
+from app.database.errors import EntityDoesNotExist
+from app.models.projects import ProjectDomain
 from typing import List
 
 

@@ -3,12 +3,12 @@ from starlette import status
 from app.api.dependencies.authentication import get_current_user_authorizer
 from app.api.dependencies.projects import get_project_by_id_from_path, check_project_ownership
 from app.api.dependencies.database import get_repository
-from app.db.repositories.projects import ProjectsRepository
-from app.models.domains.users import UserDomain
-from app.models.domains.projects import ProjectDomain
-from app.models.schemas.projects import ProjectInCreate, ProjectInResponse, ListOfProjectsInResponse, ProjectInUpdate
+from app.database.repositories.projects import ProjectsRepository
+from app.models.users import User
+from app.models.projects import ProjectDomain
+from app.schemas import ProjectInCreate, ProjectInResponse, ListOfProjectsInResponse, ProjectInUpdate
 from app.resourses import strings
-from app.db.errors import EntityDoesNotExist
+from app.database.errors import EntityDoesNotExist
 
 router = APIRouter()
 
@@ -22,7 +22,7 @@ router = APIRouter()
 async def create_new_project(
     project_create: ProjectInCreate = Body(...),
     project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository)),
-    user: UserDomain = Depends(get_current_user_authorizer())
+    user: User = Depends(get_current_user_authorizer())
 ) -> ProjectInResponse:
     try:
         if await project_repo.get_project_by_title(title=project_create.title):
@@ -45,7 +45,7 @@ async def create_new_project(
 )
 async def list_projects(
     project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository)),
-    user: UserDomain = Depends(get_current_user_authorizer())
+    user: User = Depends(get_current_user_authorizer())
 ) -> ListOfProjectsInResponse:
     projects = await project_repo.get_all_projects_by_owner_id(owner_id=user.id)
 

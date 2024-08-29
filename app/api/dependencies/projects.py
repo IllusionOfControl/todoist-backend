@@ -1,9 +1,9 @@
 from app.api.dependencies.database import get_repository
 from app.api.dependencies.authentication import get_current_user_authorizer
-from app.db.errors import EntityDoesNotExist
-from app.db.repositories.projects import ProjectsRepository
-from app.models.domains.users import UserDomain
-from app.models.domains.projects import ProjectDomain
+from app.database.errors import EntityDoesNotExist
+from app.database.repositories.projects import ProjectsRepository
+from app.models.users import User
+from app.models.projects import ProjectDomain
 from app.resourses import strings
 from fastapi import Depends, HTTPException
 from starlette import status
@@ -24,7 +24,7 @@ async def get_project_by_id_from_path(
 
 def check_project_ownership(
     current_project: ProjectDomain = Depends(get_project_by_id_from_path),
-    user: UserDomain = Depends(get_current_user_authorizer())
+    user: User = Depends(get_current_user_authorizer())
 ) -> None:
     if not current_project.owner_id == user.id:
         raise HTTPException(

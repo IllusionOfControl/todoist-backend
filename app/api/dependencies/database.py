@@ -1,25 +1,14 @@
-from fastapi import Depends, Request
-from asyncpg import Pool, Connection
-from app.db.repositories.base import BaseRepository
-from typing import Type, Annotated
+from typing import Annotated
+
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database.database import database
 
 
-async def _get_connection_from_pool(request: Request):
-    pool: Pool = request.app.state.pool
-
-    async with pool.acquire() as connection:
-        yield connection
+async def get_database_session() -> AsyncSession:
+    async with database.session() as session:
+        yield session
 
 
-def get_repository(
-    repo_type: Type[BaseRepository],
-):
-    def _get_repo(
-        connection: Connection = Depends(_get_connection_from_pool)
-    ):
-        return repo_type(connection)
-
-    return _get_repo
-
-
-DbConnectionDep = Annotated[Connection, Depends(_get_connection_from_pool)]
+DatabaseSessionDep = Annotated[AsyncSession, Depends(get_database_session)]

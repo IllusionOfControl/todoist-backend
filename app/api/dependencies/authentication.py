@@ -8,9 +8,9 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.api.dependencies.database import get_repository
 from app.core.config import get_app_settings
 from app.core.settings.app import AppSettings
-from app.db.errors import EntityDoesNotExist
-from app.db.repositories.users import UsersRepository
-from app.models.domains.users import UserDomain
+from app.database.errors import EntityDoesNotExist
+from app.database.repositories.users import UsersRepository
+from app.models.users import User
 from app.services import jwt
 from app.resourses import strings
 
@@ -75,7 +75,7 @@ async def _get_current_user(
     users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
     token: str = Depends(_get_authorization_header_retriever()),
     settings: AppSettings = Depends(get_app_settings),
-) -> UserDomain:
+) -> User:
     try:
         username = jwt.get_username_from_token(
             token,
@@ -88,7 +88,7 @@ async def _get_current_user(
         )
 
     try:
-        return await users_repo.get_user_by_username(username=username)
+        return await users_repo.get_by_username(username=username)
     except EntityDoesNotExist:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -100,7 +100,7 @@ async def _get_current_user_optional(
     repo: UsersRepository = Depends(get_repository(UsersRepository)),
     token: str = Depends(_get_authorization_header_retriever(required=False)),
     settings: AppSettings = Depends(get_app_settings),
-) -> Optional[UserDomain]:
+) -> Optional[User]:
     if token:
         return await _get_current_user(repo, token, settings)
 

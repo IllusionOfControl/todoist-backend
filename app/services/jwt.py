@@ -1,18 +1,18 @@
 from datetime import datetime, timedelta
-from typing import Dict
+from typing import Dict, Protocol
 
 from pydantic import ValidationError
 
 import jwt
-from app.models.domains.users import UserDomain
-from app.models.schemas.jwt import JWTMeta, JWTUser
+from app.models.users import User
+from app.schemas.jwt import JWTMeta, JWTUser
 
 JWT_SUBJECT = "access"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # one week
 
 
-class JWTService:
+class JWTService(Protocol):
 
     def __init__(self, secret_key: str) -> None:
         self._secret_key = secret_key
@@ -29,7 +29,7 @@ class JWTService:
         to_encode.update(JWTMeta(exp=expire, sub=JWT_SUBJECT).dict())
         return jwt.encode(to_encode, secret_key, algorithm=ALGORITHM)
 
-    def create_access_token_for_user(self, user: UserDomain) -> str:
+    def create_access_token_for_user(self, user: User) -> str:
         return self.create_jwt_token(
             jwt_content=JWTUser(username=user.username).dict(),
             secret_key=self._secret_key,

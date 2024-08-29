@@ -2,8 +2,8 @@ from fastapi import APIRouter, Body
 from starlette.status import HTTP_201_CREATED, HTTP_200_OK
 
 from app.api.dependencies.services import AuthenticationServiceDep
-from app.models.schemas.authentication import SignInRequest, SignInResponse
-from app.models.schemas.response import TodoistResponse
+from app.schemas import SignInRequest, SignInResponse
+from app.schemas.response import TodoistResponse
 
 router = APIRouter()
 

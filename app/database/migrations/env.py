@@ -10,7 +10,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[3]))
 from app.core.config import get_app_settings
 
 SETTINGS = get_app_settings()
-DATABASE_URL = SETTINGS.database_url
+DATABASE_URL = SETTINGS.database.url
 
 config = context.config
 

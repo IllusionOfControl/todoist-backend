@@ -2,14 +2,14 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from app.api.dependencies.database import DbConnectionDep
-from app.db.repositories.users import UsersRepository
+from app.api.dependencies.database import DatabaseSessionDep
+from app.database.repositories.users import UsersRepository
 
 
 def get_user_repository(
-        connection: DbConnectionDep
+        session: DatabaseSessionDep
 ) -> UsersRepository:
-    return UsersRepository(connection)
+    return UsersRepository(session)
 
 
 UsersRepositoryDep = Annotated[UsersRepository, Depends(get_user_repository)]

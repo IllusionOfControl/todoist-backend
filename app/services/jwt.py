@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from typing import Dict, Protocol
 
+import jwt
 from pydantic import ValidationError
 
-import jwt
 from app.models.users import User
 from app.schemas.jwt import JWTMeta, JWTUser
 
@@ -13,7 +13,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # one week
 
 
 class JWTService(Protocol):
-
     def __init__(self, secret_key: str) -> None:
         self._secret_key = secret_key
 

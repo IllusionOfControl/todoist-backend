@@ -1,104 +1,62 @@
+from datetime import datetime
+
+from sqlalchemy import insert, select, update, delete
+
 from app.database.repositories.base import BaseRepository
-from app.database.errors import EntityDoesNotExist
-from app.models.projects import ProjectDomain
-from typing import List
+from app.models.projects import Project
+from app.models.tasks import Task
 
 
 class ProjectsRepository(BaseRepository):
-    async def create_project(
-        self,
-        *,
-        title: str,
-        owner_id: int,
-    ) -> ProjectDomain:
-        sql = """
-            INSERT INTO projects (title, owner_id) 
-            VALUES (($1), ($2)) 
-            RETURNING *;
-        """
+    async def create(
+            self,
+            uuid: str,
+            title: str,
+            description: str,
+            owner_id: int
+    ) -> Project:
+        query = insert(Project).values(
+            uuid=uuid,
+            title=title,
+            description=description,
+            owner_id=owner_id
+        ).returning(Project)
 
-        project_row = await self.connection.fetch(
-            sql,
-            title,
-            owner_id
-        )
+        result = await self._session.execute(query)
+        return result.scalar()
 
-        return ProjectDomain(**dict(*project_row))
+    async def get_by_uid(self, uuid: str) -> Project:
+        query = select(Project).where(Project.uuid == uuid)
+        return await self._session.scalar(query)
 
-    async def get_all_projects_by_owner_id(self, *, owner_id: int) -> List[ProjectDomain]:
-        sql = """
-            SELECT * FROM projects WHERE owner_id=$1;
-        """
+    async def get_all_by_owner(self, owner_id: int) -> list[Project]:
+        query = select(Project).where(Project.owner_id == owner_id)
+        result = await self._session.execute(query)
+        return list(result.scalars())
 
-        projects_rows = await self.connection.fetch(
-            sql,
-            owner_id
-        )
+    async def update(
+            self,
+            uid: str,
+            title: str,
+            description: str,
+            color: int,
+    ) -> Project:
+        query = update(Project).where(Task.uid == uid).values(
+            updated_at=datetime.now()
+        ).returning(Project)
 
-        return [ProjectDomain(**dict(row)) for row in projects_rows]
+        if title:
+            query.values(title=title)
+        if description is not None:
+            query.values(description=description)
+        if color is not None:
+            query.values(color=color)
 
-    async def get_project_by_id(self, *, project_id: int) -> ProjectDomain:
-        sql = """
-            SELECT * FROM projects WHERE id=$1;
-        """
+        result = await self._session.execute(query)
 
-        project_row = await self.connection.fetch(
-            sql,
-            project_id
-        )
+        return result.scalar()
 
-        if project_row:
-            return ProjectDomain(**dict(*project_row))
-
-        raise EntityDoesNotExist("project does not exists")
-
-    async def get_project_by_title(self, *, title: str) -> ProjectDomain:
-        sql = """
-            SELECT * FROM projects WHERE title=$1;
-        """
-
-        project_row = await self.connection.fetchrow(
-            sql,
-            title
-        )
-        if project_row:
-            return ProjectDomain(**dict(project_row))
-
-        raise EntityDoesNotExist("project does not exists")
-
-    async def update_project(
-        self,
-        *,
-        project: ProjectDomain,
-        title,
-        description,
-    ):
-        sql = """
-            UPDATE projects
-            SET title=$2, description=$3, updated_at=now()
-            WHERE id=$1
-            RETURNING *;
-        """
-
-        updated_project = project.copy(deep=True)
-        updated_project.title = title or project.title
-        updated_project.description = description or project.description
-
-        updated_project.updated_at = await self.connection.fetch(
-            sql,
-            updated_project.id,
-            updated_project.title,
-            updated_project.description
-        )
-
-        return updated_project
-
-    async def remove_project(self, *, project: ProjectDomain):
-        sql = """
-            DELETE FROM projects WHERE id=($1);
-        """
-
-        await self.connection.fetch(
-            sql,
-            project.id
-        )
+    async def delete(self, uid: str) -> int:
+        query = delete(Project).where(uid=uid)
+        result = await self._session.execute(query)
+        return result.rowcount()

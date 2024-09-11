@@ -1,12 +1,19 @@
-from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+
+from sqlalchemy import ForeignKey, func
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.database import Base
 
 
-class ProjectDomain(BaseModel):
-    id: int
-    owner_id: int
-    title: str
-    description: Optional[str] = ""
-    created_at: datetime
-    updated_at: datetime
+class Project(Base):
+    __tablename__ = 'projects'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    uuid: Mapped[str] = mapped_column(unique=True)
+    owner_id: Mapped[str] = mapped_column(ForeignKey("users.id"), unique=True)
+    title: Mapped[str]
+    description: Mapped[str]
+    color: Mapped[int]
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    updated_at: Mapped[datetime]

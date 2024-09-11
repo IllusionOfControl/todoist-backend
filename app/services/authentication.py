@@ -1,8 +1,8 @@
-from app.core.exceptions import NotFoundError, AuthError, BadRequestError
+from app.core.exceptions import UserNotFoundException, IncorrectLoginInputException, UsernameAlreadyTakenException, EmailAlreadyTakenException
 from app.core.secutiry import verify_password
 from app.database.repositories.users import UsersRepository
 from app.resourses import strings
-from app.schemas import SignInResponse, SignInRequest, SignUpRequest
+from app.schemas import SignInResult, SignInRequest, SignUpRequest
 from app.services.jwt import JWTService
 
 
@@ -19,20 +19,20 @@ class AuthenticationService:
         user = await self._user_repository.get_by_email(email=email)
         return user is not None
 
-    async def handle_sign_in(self, *, request: SignInRequest) -> SignInResponse:
+    async def handle_sign_in(self, *, request: SignInRequest) -> SignInResult:
         user = await self._user_repository.get_by_username(request.username)
         if user is None:
-            raise NotFoundError(f"user with username {request.username} not found")
+            raise UserNotFoundException()
 
         if not verify_password(user.password_salt + request.password, user.password_hash):
-            raise AuthError("login or password is incorrect")
+            raise IncorrectLoginInputException()
 
         token = self._jwt_service.create_access_token_for_user(
             user,
         )
 
         # TODO: Make refresh token
-        return SignInResponse(
+        return SignInResult(
             username=user.username,
             user_id=str(user.id),
             access_token=token,
@@ -40,12 +40,12 @@ class AuthenticationService:
             # refresh_token=token,
         )
 
-    async def handle_sign_up(self, *, request: SignUpRequest) -> SignInResponse:
+    async def handle_sign_up(self, *, request: SignUpRequest) -> SignInResult:
         if await self.check_username_is_taken(request.username):
-            raise BadRequestError(strings.USERNAME_TAKEN)
+            raise UsernameAlreadyTakenException(strings.USERNAME_TAKEN)
 
         if await self.check_email_is_taken(request.email):
-            raise BadRequestError(strings.EMAIL_TAKEN)
+            raise EmailAlreadyTakenException(strings.EMAIL_TAKEN)
 
         user = await self._user_repository.create(
             username=request.username,
@@ -57,7 +57,7 @@ class AuthenticationService:
         token = self._jwt_service.create_access_token_for_user(
             user,
         )
-        return SignInResponse(
+        return SignInResult(
             username=user.username,
             user_id=str(user.id),
             access_token=token,

@@ -1,6 +1,6 @@
 import pytest
 
-from app.core.exceptions import NotFoundError, AuthError, BadRequestError
+from app.core.exceptions import UsernameAlreadyTakenException, EmailAlreadyTakenException, IncorrectLoginInputException, UserNotFoundException
 from app.schemas import SignInRequest, SignUpRequest
 from app.services.authentication import AuthenticationService
 
@@ -28,14 +28,14 @@ async def test_handle_sign_in_successful(authentication_service: AuthenticationS
 @pytest.mark.asyncio
 async def test_handle_sign_in_wrong_password(authentication_service: AuthenticationService, test_user):
     sign_in_request = SignInRequest(username="testuser", password="wrongpassword")
-    with pytest.raises(AuthError):
+    with pytest.raises(IncorrectLoginInputException):
         await authentication_service.handle_sign_in(request=sign_in_request)
 
 
 @pytest.mark.asyncio
 async def test_handle_sign_in_user_not_found(authentication_service: AuthenticationService):
     sign_in_request = SignInRequest(username="nonexistentuser", password="somepassword")
-    with pytest.raises(NotFoundError):
+    with pytest.raises(UserNotFoundException):
         await authentication_service.handle_sign_in(request=sign_in_request)
 
 
@@ -58,7 +58,7 @@ async def test_handle_sign_up_username_taken(authentication_service: Authenticat
         email="newuser@example.com",
         password="newpassword"
     )
-    with pytest.raises(BadRequestError):
+    with pytest.raises(UsernameAlreadyTakenException):
         await authentication_service.handle_sign_up(request=sign_up_request)
 
 
@@ -69,5 +69,5 @@ async def test_handle_sign_up_email_taken(authentication_service: Authentication
         email="testuser@example.com",
         password="newpassword"
     )
-    with pytest.raises(BadRequestError):
+    with pytest.raises(EmailAlreadyTakenException):
         await authentication_service.handle_sign_up(request=sign_up_request)

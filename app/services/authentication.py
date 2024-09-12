@@ -1,6 +1,7 @@
 from app.core.exceptions import UserNotFoundException, IncorrectLoginInputException, UsernameAlreadyTakenException, EmailAlreadyTakenException
 from app.core.secutiry import verify_password
 from app.database.repositories.users import UsersRepository
+from app.models.users import User
 from app.resourses import strings
 from app.schemas import SignInResult, SignInRequest, SignUpRequest
 from app.services.jwt import JWTService
@@ -19,7 +20,7 @@ class AuthenticationService:
         user = await self._user_repository.get_by_email(email=email)
         return user is not None
 
-    async def handle_sign_in(self, *, request: SignInRequest) -> SignInResult:
+    async def handle_sign_in(self, request: SignInRequest) -> SignInResult:
         user = await self._user_repository.get_by_username(request.username)
         if user is None:
             raise UserNotFoundException()
@@ -40,7 +41,7 @@ class AuthenticationService:
             # refresh_token=token,
         )
 
-    async def handle_sign_up(self, *, request: SignUpRequest) -> SignInResult:
+    async def handle_sign_up(self, request: SignUpRequest) -> SignInResult:
         if await self.check_username_is_taken(request.username):
             raise UsernameAlreadyTakenException(strings.USERNAME_TAKEN)
 
@@ -64,3 +65,11 @@ class AuthenticationService:
             refresh_token="",
             # refresh_token=token,
         )
+
+    async def get_current_user(self, token: str) -> User:
+        user_uid = self._jwt_service.get_user_uid_from_token(token)
+        if user := await self._user_repository.get_by_uid(user_uid):
+            return user
+        else:
+            raise IncorrectLoginInputException()
+

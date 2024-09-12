@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 
 from app.api.dependencies.database import DatabaseSessionDep
+from app.database.repositories.tasks import TasksRepository
 from app.database.repositories.users import UsersRepository
 
 
@@ -13,3 +14,12 @@ def get_user_repository(
 
 
 UsersRepositoryDep = Annotated[UsersRepository, Depends(get_user_repository)]
+
+
+def get_tasks_repository(
+        session: DatabaseSessionDep
+) -> TasksRepository:
+    return TasksRepository(session)
+
+
+TasksRepositoryDep = Annotated[TasksRepository, Depends(get_tasks_repository)]

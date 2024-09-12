@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import select, insert, delete
 
 from app.core.secutiry import generate_salt, get_password_hash
@@ -6,6 +8,12 @@ from app.models.users import User
 
 
 class UsersRepository(BaseRepository):
+    async def get_by_uid(self, uid: str) -> User | None:
+        query = select(User).where(User.uid == uid)
+
+        if user := await self._session.scalar(query):
+            return user
+
     async def get_by_username(self, username: str) -> User | None:
         query = select(User).where(User.username == username)
 
@@ -26,6 +34,7 @@ class UsersRepository(BaseRepository):
     ) -> User:
         password_salt = generate_salt()
         query = insert(User).values(
+            uid=uuid.uuid4().hex,
             username=username,
             email=email,
             password_hash=get_password_hash(password_salt + password),
@@ -35,7 +44,7 @@ class UsersRepository(BaseRepository):
         result = await self._session.execute(query)
         return result.scalar()
 
-    async def delete(self, id: int) -> User:
-        query = delete(User).where(User.id == id).returning(User)
+    async def delete(self, uid: int) -> User:
+        query = delete(User).where(User.uid == uid).returning(User)
         result = await self._session.execute(query)
         return result.scalar()

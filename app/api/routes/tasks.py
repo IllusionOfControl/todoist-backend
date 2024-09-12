@@ -1,96 +1,64 @@
-from fastapi import APIRouter, Body, Depends, Response
-from starlette import status
-from app.schemas import TaskInResponse, TaskInCreate, ListOfTasksInResponse, TaskInUpdate
-from app.models.tasks import TaskDomain
-from app.database.repositories.tasks import TaskRepository
-from app.api.dependencies.projects import get_project_by_id_from_path, check_project_ownership
-from app.api.dependencies.tasks import get_task_by_id_from_path
-from app.api.dependencies.authentication import get_current_user_authorizer
-from app.models.projects import ProjectDomain
-from app.api.dependencies.database import get_repository
+from fastapi import APIRouter, Depends
 
-router = APIRouter()
+from app.api.dependencies.authentication import CurrentUser
+from app.api.dependencies.projects import check_project_ownership
+from app.api.dependencies.services import TaskServiceDep
+from app.schemas.response import TodoistResponse
+from app.schemas.tasks import TaskData, TaskToUpdate, TaskInResponse
+
+router = APIRouter(
+    prefix="/tasks"
+)
 
 
-@router.post(
-    "",
-    status_code=status.HTTP_201_CREATED,
-    response_model=TaskInResponse,
+@router.get(
+    "/{task_uid}",
+    response_model=TaskInResponse[TaskData],
     name="tasks:create_task",
     dependencies=[Depends(check_project_ownership)]
 )
-async def create_new_task(
-    task_create: TaskInCreate = Body(...),
-    task_repo: TaskRepository = Depends(get_repository(TaskRepository)),
-    project: ProjectDomain = Depends(get_project_by_id_from_path)
+async def get_task(
+        task_uid: str,
+        task_service: TaskServiceDep,
+        current_user: CurrentUser,
 ) -> TaskInResponse:
-    task = await task_repo.create_task(title=task_create.title, project=project)
+    task = await task_service.get_task(current_user, task_uid)
 
     return TaskInResponse(**task.dict())
 
 
-@router.get(
-    "",
-    response_model=ListOfTasksInResponse,
-    name="tasks:list-tasks",
-    dependencies=[Depends(get_current_user_authorizer())]
+@router.delete(
+    "/{task_uid}",
+    response_model=TodoistResponse,
+    name="tasks:delete",
 )
-async def list_projects(
-    task_repo: TaskRepository = Depends(get_repository(TaskRepository)),
-    project: ProjectDomain = Depends(get_project_by_id_from_path)
-) -> ListOfTasksInResponse:
-    tasks = await task_repo.get_all_tasks_by_project(project=project)
+async def delete_task(
+        task_uid: str,
+        task_service: TaskServiceDep,
+        current_user: CurrentUser,
+) -> TodoistResponse:
+    await task_service.delete_task(current_user, task_uid)
 
-    tasks_for_response = [
-        TaskInResponse(**task.dict()) for task in tasks
-    ]
-
-    return ListOfTasksInResponse(
-        tasks=tasks_for_response,
-        count=len(tasks_for_response)
+    return TodoistResponse(
+        success=True
     )
-
-
-@router.get(
-    '/{task_id}',
-    response_model=TaskInResponse,
-    name="tasks:get-task",
-    dependencies=[Depends(check_project_ownership)]
-)
-async def retrieve_task_by_id(
-    task: TaskDomain = Depends(get_task_by_id_from_path)
-) -> TaskInResponse:
-    return TaskInResponse(**task.dict())
 
 
 @router.put(
     '/{task_id}',
-    response_model=TaskInResponse,
-    name="tasks:update-task",
-    dependencies=[Depends(check_project_ownership)]
+    response_model=TodoistResponse[TaskData],
+    name="tasks:update",
 )
-async def update_task_by_id(
-    task_update: TaskInUpdate = Body(...),
-    task_repo: TaskRepository = Depends(get_repository(TaskRepository)),
-    task: TaskDomain = Depends(get_task_by_id_from_path)
-) -> TaskInResponse:
-    new_project = await task_repo.update_task(
-        task=task,
-        **task_update.dict()
+async def update_task(
+        task_uid: str,
+        task_to_update: TaskToUpdate,
+        task_service: TaskServiceDep,
+        current_user: CurrentUser,
+) -> TodoistResponse[TaskData]:
+    updated_task = await task_service.update_task(
+        current_user, task_uid, task_to_update
     )
-
-    return TaskInResponse(**new_project.dict())
-
-
-@router.delete(
-    '/{task_id}',
-    status_code=status.HTTP_204_NO_CONTENT,
-    name="task:remove-task",
-    dependencies=[Depends(check_project_ownership)],
-    response_class=Response
-)
-async def remove_project(
-    task: TaskDomain = Depends(get_task_by_id_from_path),
-    task_repo: TaskRepository = Depends(get_repository(TaskRepository))
-) -> None:
-    await task_repo.remove_project(task=task)
+    return TodoistResponse[TaskData](
+        success=True,
+        data=updated_task,
+    )

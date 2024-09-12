@@ -1,4 +1,4 @@
-from core.application import Application
+from app.core.application import Application
 
 
 def get_application() -> Application:

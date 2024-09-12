@@ -12,6 +12,10 @@ class TasksRepository(BaseRepository):
         result = await self._session.scalars(query)
         return list(result)
 
+    async def get_by_uid(self, uid: str) -> Task:
+        query = select(Task).where(Task.uid == uid).limit(1)
+        return await self._session.scalar(query)
+
     async def create_task(
             self,
             uuid: str,

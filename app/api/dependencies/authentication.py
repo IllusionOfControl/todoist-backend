@@ -1,107 +1,40 @@
-from typing import Callable, Optional
+from typing import Annotated
 
-from fastapi import Depends, HTTPException, Security
-from fastapi.security import APIKeyHeader
-from starlette import requests, status
-from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi import Depends
 
-from app.api.dependencies.database import get_repository
-from app.core.config import get_app_settings
-from app.core.settings.app import AppSettings
-from app.database.errors import EntityDoesNotExist
-from app.database.repositories.users import UsersRepository
+from app.api.dependencies.services import AuthenticationServiceDep
+from app.core.security import TodoistTokenHeader
 from app.models.users import User
-from app.services import jwt
-from app.resourses import strings
 
-HEADER_KEY = "Authorization"
+token_security = TodoistTokenHeader(
+    name="Authorization",
+    scheme_name="JWT Token",
+    description="Token Format: `Token xxxxxx.yyyyyyy.zzzzzz`",
+    raise_error=True,
+)
+token_security_optional = TodoistTokenHeader(
+    name="Authorization",
+    scheme_name="JWT Token",
+    description="Token Format: `Token xxxxxx.yyyyyyy.zzzzzz`",
+    raise_error=False,
+)
 
-
-class TodoistApiKeyHeader(APIKeyHeader):
-    async def __call__(
-        self,
-        request: requests.Request,
-    ) -> Optional[str]:
-        try:
-            return await super().__call__(request)
-        except StarletteHTTPException as original_auth_exc:
-            raise HTTPException(
-                status_code=original_auth_exc.status_code,
-                detail=strings.AUTHENTICATION_REQUIRED,
-            )
+JWTToken = Annotated[str, Depends(token_security)]
+JWTTokenOptional = Annotated[str, Depends(token_security_optional)]
 
 
-def get_current_user_authorizer(*, required: bool = True) -> Callable:
-    return _get_current_user if required else _get_current_user_optional
-
-
-def _get_authorization_header_retriever(*, required: bool = True) -> Callable:
-    return _get_authorization_header if required else _get_authorization_header_optional
-
-
-def _get_authorization_header(
-    api_key: str = Security(TodoistApiKeyHeader(name=HEADER_KEY)),
-    settings: AppSettings = Depends(get_app_settings),
-) -> str:
-    try:
-        token_prefix, token = api_key.split(" ")
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=strings.WRONG_TOKEN_PREFIX,
-        )
-    if token_prefix != settings.jwt_token_prefix:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=strings.WRONG_TOKEN_PREFIX,
-        )
-
-    return token
-
-
-def _get_authorization_header_optional(
-    authorization: Optional[str] = Security(
-        TodoistApiKeyHeader(name=HEADER_KEY, auto_error=False),
-    ),
-    settings: AppSettings = Depends(get_app_settings),
-) -> str:
-    if authorization:
-        return _get_authorization_header(authorization, settings)
-
-    return ""
-
-
-async def _get_current_user(
-    users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
-    token: str = Depends(_get_authorization_header_retriever()),
-    settings: AppSettings = Depends(get_app_settings),
-) -> User:
-    try:
-        username = jwt.get_username_from_token(
-            token,
-            secret_key=settings.secret_key.get_secret_value(),
-        )
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=strings.MALFORMED_PAYLOAD,
-        )
-
-    try:
-        return await users_repo.get_by_username(username=username)
-    except EntityDoesNotExist:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=strings.MALFORMED_PAYLOAD,
-        )
-
-
-async def _get_current_user_optional(
-    repo: UsersRepository = Depends(get_repository(UsersRepository)),
-    token: str = Depends(_get_authorization_header_retriever(required=False)),
-    settings: AppSettings = Depends(get_app_settings),
-) -> Optional[User]:
+async def get_current_user_or_none(token: JWTTokenOptional, user_service: AuthenticationServiceDep):
     if token:
-        return await _get_current_user(repo, token, settings)
+        current_user = await user_service.get_current_user(token=token)
+        return current_user
 
-    return None
+
+async def get_current_user(
+        token: JWTToken, user_service: AuthenticationServiceDep
+) -> User:
+    current_user = await user_service.get_current_user(token=token)
+    return current_user
+
+
+CurrentOptionalUser = Annotated[User | None, Depends(get_current_user_or_none)]
+CurrentUser = Annotated[User, Depends(get_current_user)]

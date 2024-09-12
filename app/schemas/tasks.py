@@ -13,6 +13,12 @@ class TaskData(BaseModel):
     updated_at: datetime = Field(description="task update date")
 
 
+class TaskToUpdate(BaseModel):
+    content: str | None = Field(None, description="task content")
+    is_finished: bool | None = Field(None, description="is finished flag")
+    scheduled_at: date | None = Field(None, description="schedule date")
+
+
 class TaskInResponse(BaseModel):
     id: str
     project_id: int

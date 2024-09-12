@@ -3,7 +3,7 @@ import sys
 from typing import Any, Dict, List
 
 from loguru import logger
-from pydantic import BaseModel, field_validator, PostgresDsn
+from pydantic import BaseModel, field_validator, PostgresDsn, SecretStr
 
 from app.core.logging import InterceptHandler
 from app.core.settings.base import BaseAppSettings
@@ -39,6 +39,7 @@ class SecuritySettings(BaseModel):
     api_prefix: str = "/api"
     jwt_token_prefix: str = "Token"
     allowed_hosts: List[str] = []
+    secret_key: SecretStr
 
 
 class LoggingSettings(BaseModel):

@@ -18,6 +18,9 @@ class Application:
             lifespan=self.lifespan
         )
 
+        self.configure_middlewares()
+        self.configure_routes()
+
     def configure_middlewares(self):
         self._app.add_middleware(
             CORSMiddleware,

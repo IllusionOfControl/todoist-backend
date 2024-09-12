@@ -1,30 +1,32 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
 from app.api.dependencies.authentication import CurrentUser
-from app.api.dependencies.projects import check_project_ownership
 from app.api.dependencies.services import TaskServiceDep
 from app.schemas.response import TodoistResponse
-from app.schemas.tasks import TaskData, TaskToUpdate, TaskInResponse
+from app.schemas.tasks import TaskData, TaskToUpdate
 
 router = APIRouter(
-    prefix="/tasks"
+    prefix="/tasks",
+    tags=["tasks"],
 )
 
 
 @router.get(
     "/{task_uid}",
-    response_model=TaskInResponse[TaskData],
-    name="tasks:create_task",
-    dependencies=[Depends(check_project_ownership)]
+    response_model=TodoistResponse[TaskData],
+    name="tasks:get",
 )
 async def get_task(
         task_uid: str,
         task_service: TaskServiceDep,
         current_user: CurrentUser,
-) -> TaskInResponse:
+) -> TodoistResponse:
     task = await task_service.get_task(current_user, task_uid)
 
-    return TaskInResponse(**task.dict())
+    return TodoistResponse[TaskData](
+        success=True,
+        data=task,
+    )
 
 
 @router.delete(

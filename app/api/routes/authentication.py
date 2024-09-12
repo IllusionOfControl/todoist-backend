@@ -5,7 +5,10 @@ from app.api.dependencies.services import AuthenticationServiceDep
 from app.schemas import SignInRequest, SignInResult
 from app.schemas.response import TodoistResponse
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/api",
+    tags=["authentication"]
+)
 
 
 @router.post(

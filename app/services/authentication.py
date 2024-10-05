@@ -2,8 +2,6 @@ from app.core.exceptions import UserNotFoundException, IncorrectLoginInputExcept
 from app.core.secutiry import verify_password
 from app.database.repositories.users import UsersRepository
 from app.models.users import User
-from app.resourses import strings
-from app.schemas import SignInResult, SignInRequest, SignUpRequest
 from app.services.jwt import JWTService
 
 
@@ -12,59 +10,45 @@ class AuthenticationService:
         self._user_repository = user_repository
         self._jwt_service = jwt_service
 
-    async def check_username_is_taken(self, username: str) -> bool:
+    async def _check_username_is_taken(self, username: str) -> bool:
         user = await self._user_repository.get_by_username(username=username)
         return user is not None
 
-    async def check_email_is_taken(self, email: str) -> bool:
+    async def _check_email_is_taken(self, email: str) -> bool:
         user = await self._user_repository.get_by_email(email=email)
         return user is not None
 
-    async def handle_sign_in(self, request: SignInRequest) -> SignInResult:
-        user = await self._user_repository.get_by_username(request.username)
+    async def sign_in_user(self, username: str, password: str) -> str:
+        user = await self._user_repository.get_by_username(username)
         if user is None:
             raise UserNotFoundException()
 
-        if not verify_password(user.password_salt + request.password, user.password_hash):
+        if not verify_password(user.password_salt + password, user.password_hash):
             raise IncorrectLoginInputException()
 
-        token = self._jwt_service.create_access_token_for_user(
-            user,
-        )
+        token = self._jwt_service.create_access_token_for_user(user)
 
         # TODO: Make refresh token
-        return SignInResult(
-            username=user.username,
-            user_id=str(user.id),
-            access_token=token,
-            refresh_token="",
-            # refresh_token=token,
-        )
+        return token
 
-    async def handle_sign_up(self, request: SignUpRequest) -> SignInResult:
-        if await self.check_username_is_taken(request.username):
-            raise UsernameAlreadyTakenException(strings.USERNAME_TAKEN)
+    async def sign_up_user(self, username: str, email: str, password: str) -> str:
+        if await self._check_username_is_taken(username):
+            raise UsernameAlreadyTakenException()
 
-        if await self.check_email_is_taken(request.email):
-            raise EmailAlreadyTakenException(strings.EMAIL_TAKEN)
+        if await self._check_email_is_taken(email):
+            raise EmailAlreadyTakenException()
 
         user = await self._user_repository.create(
-            username=request.username,
-            email=request.email,
-            password=request.password,
+            username=username,
+            email=email,
+            password=password,
         )
 
         # TODO: Make refresh token
         token = self._jwt_service.create_access_token_for_user(
             user,
         )
-        return SignInResult(
-            username=user.username,
-            user_id=str(user.id),
-            access_token=token,
-            refresh_token="",
-            # refresh_token=token,
-        )
+        return token
 
     async def get_current_user(self, token: str) -> User:
         user_uid = self._jwt_service.get_user_uid_from_token(token)

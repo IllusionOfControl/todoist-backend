@@ -6,11 +6,9 @@ class SignInRequest(BaseModel):
     password: str
 
 
-class SignInResult(BaseModel):
-    username: str
-    user_id: str
+class SignInData(BaseModel):
     access_token: str
-    refresh_token: str
+    # refresh_token: str
 
 
 class SignUpRequest(BaseModel):

@@ -18,20 +18,22 @@ class TasksRepository(BaseRepository):
         query = select(Task).where(Task.uid == uid).limit(1)
         return await self._session.scalar(query)
 
+    async def get_for_project_by_uid(self, project_id: int, uid: str) -> Task:
+        query = select(Task).where(Task.uid == uid).where(Task.project_id == project_id).limit(1)
+        return await self._session.scalar(query)
+
     async def create_task(
             self,
             uuid: str,
             content: str,
             project_id: int,
             scheduled_at: date,
-            owner_id: int,
     ) -> Task:
         query = insert(Task).values(
             uuid=uuid,
             content=content,
             project_id=project_id,
             scheduled_at=scheduled_at,
-            owner_id=owner_id
         ).returning(Task)
         result = await self._session.execute(query)
 
@@ -40,9 +42,9 @@ class TasksRepository(BaseRepository):
     async def update_task(
             self,
             uuid: str,
-            content: str,
-            is_finished: bool,
-            scheduled_at: date,
+            content: str | None,
+            is_finished: bool | None,
+            scheduled_at: date | None,
     ):
         query = (update(Task)
                  .where(Task.uid == uuid)

@@ -1,28 +1,24 @@
 import uuid
 from datetime import date
 
+from app.core.exceptions import TaskNotFoundException
 from app.database.repositories.tasks import TasksRepository
-from app.models.projects import Project
 from app.models.tasks import Task
-from app.models.users import User
-from app.schemas.tasks import TaskData, TaskToUpdate
+from app.schemas.tasks import TaskData
 
 
 class TaskService:
     def __init__(self, tasks_repository: TasksRepository):
         self._tasks_repository = tasks_repository
 
-    async def create_task(self, current_user: User, project: Project, content: str,
-                          scheduled_at: date) -> TaskData:
-        if project.owner_id != current_user.id:
-            raise Exception()  # todo создать taskpermissionexception
+    async def create_task(self, project_id: int, content: str,
+                          scheduled_at: date | None) -> TaskData:
 
         task = await self._tasks_repository.create_task(
             uuid.uuid4().hex,
             content,
-            project.id,
+            project_id,
             scheduled_at,
-            current_user.id
         )
         return TaskData(
             content=task.content,
@@ -37,48 +33,36 @@ class TaskService:
         tasks = await self._tasks_repository.get_all_by_project(project_id)
         return tasks
 
+    async def retrieve_task(self, project_id: int, task_uid: str) -> Task:
+        task = await self._tasks_repository.get_for_project_by_uid(project_id, task_uid)
+        return task
 
-    async def update_task(self, current_user: User, task_uid: str, task_to_update: TaskToUpdate) -> TaskData:
-        task = await self._tasks_repository.get_by_uid(task_uid)
-        if task.owner_id != current_user.id:
-            raise Exception()  # todo создать taskpermissionexception
+    async def update_task(self, project_id: int, task_uid: str, content: str | None, is_finished: str | None,
+                          scheduled_at: date | None) -> Task:
+        task = await self._tasks_repository.get_for_project_by_uid(project_id, task_uid)
+        if not task:
+            raise TaskNotFoundException()
 
         task = await self._tasks_repository.update_task(
             task.uid,
-            task_to_update.content,
-            task.is_finished,
-            task.scheduled_at,
+            content,
+            is_finished,
+            scheduled_at,
         )
 
-        return TaskData(
-            content=task.content,
-            uid=task.uid,
-            is_finished=task.is_finished,
-            scheduled_at=task.scheduled_at,
-            created_at=task.created_at,
-            updated_at=task.updated_at,
-        )
+        return task
 
-    async def delete_task(self, current_user: User, task_uid: str) -> bool:
-        task = await self._tasks_repository.get_by_uid(task_uid)
-        if task.owner_id != current_user.id:
-            raise Exception()  # todo создать taskpermissionexception
+    async def delete_task(self, project_id: int, task_uid: str) -> Task:
+        task = await self._tasks_repository.get_for_project_by_uid(project_id, task_uid)
+        if not task:
+            raise TaskNotFoundException()
 
-        return bool(await self._tasks_repository.delete(task_uid))
+        return task
 
-    async def get_task(self, current_user: User, task_uid: str) -> TaskData:
-        task = await self._tasks_repository.get_by_uid(task_uid)
+    async def get_task(self, project_id: int, task_uid: str) -> Task:
+        task = await self._tasks_repository.get_for_project_by_uid(project_id, task_uid)
 
-        if task.owner_id != current_user.id:
-            raise Exception()  # todo создать taskpermissionexception
+        if not task:
+            raise TaskNotFoundException()
 
-        return TaskData(
-            content=task.content,
-            uid=task.uid,
-            is_finished=task.is_finished,
-            scheduled_at=task.scheduled_at,
-            created_at=task.created_at,
-            updated_at=task.updated_at,
-        )
-
-
+        return task

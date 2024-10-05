@@ -9,7 +9,7 @@ from app.database import Base
 class Task(Base):
     __tablename__ = 'tasks'
 
-    id: Mapped[int] = mapped_column(primary_key=True, auto_increment=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     uid: Mapped[str] = mapped_column(unique=True)
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"))
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))

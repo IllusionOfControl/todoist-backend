@@ -1,77 +1,56 @@
 import uuid
 
-from app.database.repositories.projects import ProjectsRepository
+from app.core.exceptions import ProjectNotFoundException, ProjectPermissionException
+from app.database.repositories.projects import ProjectRepository
 from app.models.projects import Project
-from app.models.users import User
-from app.schemas.projects import ProjectData, ProjectInfo
-from app.services.tasks import TasksService
 
 
-class ProjectService:
+class ProjectsService:
     def __init__(
             self,
-            project_repo: ProjectsRepository,
-            task_service: TasksService,
-            current_user: User,
+            project_repo: ProjectRepository,
     ):
         self._project_repo = project_repo
-        self._tasks_service = task_service
-        self._current_user = current_user
 
-    async def create_project(self, title: str, description: str) -> ProjectData:
+    async def create_project(self, owner_id: int, title: str, description: str, color: int) -> Project:
         project = await self._project_repo.create(
             uuid=uuid.uuid4().hex,
             title=title,
             description=description,
-            owner_id=self._current_user.id
+            owner_id=owner_id,
+            color=color
         )
-        return ProjectData(
-            uid=project.uuid,
-            title=project.title,
-            description=project.description,
-            color=project.color,
-            tasks=[],
-        )
+        return project
 
-    async def update_project(self, project_uid: str, title: str, description: str, color: int) -> ProjectData:
-        project = self._project_repo.get_by_uid(project_uid)
+    async def retrieve_all_projects(self, owner_id: int) -> list[Project]:
+        projects = await self._project_repo.get_all_by_owner(owner_id)
+        return projects
+
+    async def retrieve_project(self, owner_id: int, project_uid: str) -> Project:
+        project = await self._project_repo.get_by_uid(project_uid)
+        if project is None:
+            raise ProjectNotFoundException()
+        if project.owner_id != owner_id:
+            raise ProjectPermissionException()
+
+        return project
+
+    async def remove_project(self, owner_id: int, project_uid: str) -> None:
+        project = await self._project_repo.get_by_uid(project_uid)
+        if project is None:
+            raise ProjectNotFoundException()
+        if project.owner_id != owner_id:
+            raise ProjectPermissionException()
+
+        await self._project_repo.delete(project_uid)
+
+    async def update_project(self, owner_id, project_uid: str, title: str, description: str, color: int) -> Project:
+        project = await self._project_repo.get_by_uid(project_uid)
 
         if project is None:
-            raise Exception()  # todo project not found
-        if self._current_user.id != self._current_user.id:
-            pass
-            # todo project access exception
+            raise ProjectNotFoundException()
+        if owner_id.id != project.owner_id:
+            raise ProjectPermissionException()
 
         project = await self._project_repo.update(project_uid, title, description, color)
-        tasks = await self._tasks_service.list_tasks(project)
-        return ProjectData(
-            uid=project.uuid,
-            title=project.title,
-            description=project.description,
-            color=project.color,
-            tasks=tasks,
-        )
-
-    async def retrieve_projects(self) -> list[ProjectInfo]:
-        projects = await self._project_repo.get_all_by_owner(self._current_user.id)
-        return [
-            ProjectInfo(
-                uid=project.uuid,
-                title=project.title,
-                description=project.description,
-                color=project.color,
-            )
-            for project in projects
-        ]
-
-    async def retrieve_project(self, project_uid: str) -> ProjectData:
-        project = await self._project_repo.get_by_uid(project_uid)
-        tasks = await self._tasks_service.list_tasks(project)
-
-        return ProjectData(
-            uid=project.uuid,
-            title=project.title,
-            description=project.description,
-            color=project.color,
-            tasks=tasks,
-        )
+        return project

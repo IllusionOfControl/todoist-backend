@@ -3,11 +3,12 @@ from datetime import date
 
 from app.database.repositories.tasks import TasksRepository
 from app.models.projects import Project
+from app.models.tasks import Task
 from app.models.users import User
 from app.schemas.tasks import TaskData, TaskToUpdate
 
 
-class TasksService:
+class TaskService:
     def __init__(self, tasks_repository: TasksRepository):
         self._tasks_repository = tasks_repository
 
@@ -31,6 +32,11 @@ class TasksService:
             created_at=task.created_at,
             updated_at=task.updated_at,
         )
+
+    async def retrieve_all_tasks(self, project_id: int) -> list[Task]:
+        tasks = await self._tasks_repository.get_all_by_project(project_id)
+        return tasks
+
 
     async def update_task(self, current_user: User, task_uid: str, task_to_update: TaskToUpdate) -> TaskData:
         task = await self._tasks_repository.get_by_uid(task_uid)
@@ -75,22 +81,4 @@ class TasksService:
             updated_at=task.updated_at,
         )
 
-    async def list_tasks(self, current_user: User, project: Project) -> list[TaskData]:
-        if project.owner_id != current_user.id:
-            raise Exception()  # todo создать taskpermissionexception
 
-        tasks = await self._tasks_repository.get_all_by_project(
-            project.id
-        )
-
-        return [
-            TaskData(
-                content=task.content,
-                uid=task.uid,
-                is_finished=task.is_finished,
-                scheduled_at=task.scheduled_at,
-                created_at=task.created_at,
-                updated_at=task.updated_at,
-            )
-            for task in tasks
-        ]

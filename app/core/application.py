@@ -44,7 +44,8 @@ class Application:
         await database.check_connection()
 
         logger.info(f"Server Url: {self._settings.server.base_url}")
-        logger.info(f"Docs Url: {self._settings.server.base_url}{self._settings.server.docs_url}")
+        logger.info(f"OpenAPI Docs Url: {self._settings.server.base_url}{self._settings.server.openapi_docs_url}")
+        logger.info(f"Redoc Docs Url: {self._settings.server.base_url}{self._settings.server.redoc_docs_url}")
 
         yield
 

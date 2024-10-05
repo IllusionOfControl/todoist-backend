@@ -12,9 +12,10 @@ from app.core.settings.base import BaseAppSettings
 class ServerSettings(BaseModel):
     debug: bool = False
     base_url: str = 'http://localhost:8000'
-    docs_url: str = "/docs"
+    openapi_docs_url: str = "/docs"
     openapi_prefix: str = ""
-    openapi_url: str = "/openapi.json"
+    openapi_spec_url: str = "/openapi.json"
+    redoc_docs_url: str = "/docs"
     title: str = "application"
     version: str = "0.0.0"
     api_prefix: str = "/api"
@@ -23,9 +24,10 @@ class ServerSettings(BaseModel):
     def fastapi_kwargs(self) -> Dict[str, Any]:
         return {
             "debug": self,
-            "docs_url": self.docs_url,
+            "docs_url": self.openapi_docs_url,
             "openapi_prefix": self.openapi_prefix,
-            "openapi_url": self.openapi_url,
+            "openapi_url": self.openapi_spec_url,
+            "redoc_docs_url": self.redoc_docs_url,
             "title": self.title,
             "version": self.version,
         }

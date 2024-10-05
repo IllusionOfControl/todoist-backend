@@ -50,6 +50,16 @@ class ProjectPermissionException(BaseInternalException):
     _message = "you do not have permission to access this project."
 
 
+class TaskNotFoundException(BaseInternalException):
+    _status_code = 404
+    _message = "task with this id does not exist."
+
+
+class TaskPermissionException(BaseInternalException):
+    _status_code = 403
+    _message = "you do not have permission to access this task."
+
+
 class EmailAlreadyTakenException(BaseInternalException):
     _status_code = 400
     _message = "email is already taken."

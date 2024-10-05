@@ -17,14 +17,14 @@ router = APIRouter(
     "",
     status_code=status.HTTP_201_CREATED,
     response_model=TodoistResponse[ProjectData],
-    name="projects:create-project"
+    name="Create a new project"
 )
 async def create_new_project(
         create_request: ProjectCreateRequest,
-        project_repo: ProjectsServiceDep,
+        project_service: ProjectsServiceDep,
         current_user: CurrentUser
 ) -> TodoistResponse[ProjectData]:
-    project = project_repo.create_project(
+    project = project_service.create_project(
         current_user.id,
         create_request.title,
         create_request.description,
@@ -43,16 +43,16 @@ async def create_new_project(
 
 
 @router.get(
-    "/{project_id}",
+    "/{project_uid}",
     status_code=status.HTTP_200_OK,
     response_model=TodoistResponse[ProjectData],
-    name="projects:get_all_projects"
+    name="Get all projects for a current user"
 )
 async def get_all_projects(
-        project_repo: ProjectsServiceDep,
+        project_service: ProjectsServiceDep,
         current_user: CurrentUser
 ) -> TodoistResponse[ListData[ProjectData]]:
-    projects = await project_repo.retrieve_all_projects(current_user.id)
+    projects = await project_service.retrieve_all_projects(current_user.id)
 
     return TodoistResponse[ListData[ProjectData]](
         success=True,
@@ -72,19 +72,19 @@ async def get_all_projects(
 
 
 @router.get(
-    "/{project_id}",
+    "/{project_uid}",
     status_code=status.HTTP_200_OK,
     response_model=TodoistResponse[ProjectData],
-    name="projects:get-project"
+    name="Get a project"
 )
 async def get_project(
-        project_id: str,
+        project_uid: str,
         project_service: ProjectsServiceDep,
         tasks_service: TasksServiceDep,
         current_user: CurrentUser
 ) -> TodoistResponse[ProjectData]:
-    project = await project_service.retrieve_project(current_user.id, project_id)
-    tasks = await tasks_service.retrieve_all_tasks(project_id)
+    project = await project_service.retrieve_project(current_user.id, project_uid)
+    tasks = await tasks_service.retrieve_all_tasks(project_uid)
 
     return TodoistResponse[ProjectData](
         success=True,
@@ -108,19 +108,19 @@ async def get_project(
 
 
 @router.put(
-    '/{project_id}',
+    '/{project_uid}',
     status_code=status.HTTP_200_OK,
     response_model=TodoistResponse[ProjectData],
-    name="project:update-project",
+    name="Update a project",
 )
 async def update_project_by_id(
-        project_id: str,
+        project_uid: str,
         project_service: ProjectsServiceDep,
         tasks_service: TasksServiceDep,
         current_user: CurrentUser
 ) -> TodoistResponse[ProjectData]:
-    project = await project_service.update_project(current_user.id, project_id)
-    tasks = await tasks_service.retrieve_all_tasks(project_id)
+    project = await project_service.update_project(current_user.id, project_uid)
+    tasks = await tasks_service.retrieve_all_tasks(project_uid)
 
     return TodoistResponse[ProjectData](
         success=True,
@@ -144,17 +144,17 @@ async def update_project_by_id(
 
 
 @router.delete(
-    '/{project_id}',
+    '/{project_uid}',
     status_code=status.HTTP_200_OK,
-    name="project:delete-project",
+    name="Delete a project",
     response_model=TodoistResponse
 )
 async def delete_project(
-        project_id: str,
+        project_uid: str,
         project_service: ProjectsServiceDep,
         current_user: CurrentUser
 ) -> TodoistResponse:
-    await project_service.remove_project(current_user, project_id)
+    await project_service.remove_project(current_user, project_uid)
     return TodoistResponse(
         success=True,
     )

@@ -6,6 +6,8 @@ from app.api.dependencies.services import AuthenticationServiceDep
 from app.core.security import TodoistTokenHeader
 from app.models.users import User
 
+__all__ = ["JWTToken", "JWTTokenOptional", "CurrentUser", "CurrentOptionalUser"]
+
 token_security = TodoistTokenHeader(
     name="Authorization",
     scheme_name="JWT Token",

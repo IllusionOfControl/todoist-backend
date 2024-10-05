@@ -7,7 +7,7 @@ from app.schemas.response import TodoistResponse
 
 router = APIRouter(
     prefix="/api",
-    tags=["authentication"]
+    tags=["Authentication"]
 )
 
 
@@ -15,7 +15,7 @@ router = APIRouter(
     '/signin',
     status_code=HTTP_200_OK,
     response_model=TodoistResponse[SignInResult],
-    name="auth:sign-in"
+    name="User Sign In"
 )
 async def sign_in(
         authentication_service: AuthenticationServiceDep,
@@ -28,7 +28,7 @@ async def sign_in(
     '/signup',
     status_code=HTTP_201_CREATED,
     response_model=TodoistResponse[SignInResult],
-    name="auth:sign-up"
+    name="User Sign Up"
 )
 async def sign_in(
         authentication_service: AuthenticationServiceDep,

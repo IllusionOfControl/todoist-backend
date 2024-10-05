@@ -2,12 +2,15 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from app.api.dependencies.repositories import UsersRepositoryDep, TasksRepositoryDep
+from app.api.dependencies.repositories import UsersRepositoryDep, TasksRepositoryDep, ProjectsRepositoryDep
 from app.core.config import get_app_settings
 from app.core.settings.app import AppSettings
+from app.services import ProjectsService
 from app.services.authentication import AuthenticationService
 from app.services.jwt import JWTService
-from app.services.tasks import TasksService
+from app.services.tasks import TaskService
+
+__all__ = ["JWTServiceDep", "AuthenticationServiceDep", "ProjectsServiceDep", "TasksServiceDep"]
 
 
 def get_jwt_service(
@@ -32,10 +35,19 @@ def get_authentication_service(
 AuthenticationServiceDep = Annotated[AuthenticationService, Depends(get_authentication_service)]
 
 
-def get_tasks_service(
+def get_project_service(
+        projects_repository: ProjectsRepositoryDep,
+) -> ProjectsService:
+    return ProjectsService(projects_repository)
+
+
+ProjectsServiceDep = Annotated[ProjectsService, Depends(get_project_service)]
+
+
+def get_task_service(
         task_repository: TasksRepositoryDep,
-) -> TasksService:
-    return TasksService(task_repository)
+) -> TaskService:
+    return TaskService(task_repository)
 
 
-TaskServiceDep = Annotated[TasksService, Depends(get_tasks_service)]
+TasksServiceDep = Annotated[TaskService, Depends(get_task_service)]

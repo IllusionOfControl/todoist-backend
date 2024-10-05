@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 
 from app.api.dependencies.authentication import CurrentUser
-from app.api.dependencies.services import TaskServiceDep
+from app.api.dependencies.services import TasksServiceDep
 from app.schemas.response import TodoistResponse
 from app.schemas.tasks import TaskData, TaskToUpdate
 
 router = APIRouter(
-    prefix="/tasks",
-    tags=["tasks"],
+    prefix="/projects/{project_id}/tasks",
+    tags=["Tasks"],
 )
 
 
@@ -18,7 +18,7 @@ router = APIRouter(
 )
 async def get_task(
         task_uid: str,
-        task_service: TaskServiceDep,
+        task_service: TasksServiceDep,
         current_user: CurrentUser,
 ) -> TodoistResponse:
     task = await task_service.get_task(current_user, task_uid)
@@ -36,7 +36,7 @@ async def get_task(
 )
 async def delete_task(
         task_uid: str,
-        task_service: TaskServiceDep,
+        task_service: TasksServiceDep,
         current_user: CurrentUser,
 ) -> TodoistResponse:
     await task_service.delete_task(current_user, task_uid)
@@ -54,7 +54,7 @@ async def delete_task(
 async def update_task(
         task_uid: str,
         task_to_update: TaskToUpdate,
-        task_service: TaskServiceDep,
+        task_service: TasksServiceDep,
         current_user: CurrentUser,
 ) -> TodoistResponse[TaskData]:
     updated_task = await task_service.update_task(

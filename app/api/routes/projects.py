@@ -1,104 +1,160 @@
-from fastapi import APIRouter, Depends, Body, Response, HTTPException
+from fastapi import APIRouter
 from starlette import status
-from app.api.dependencies.authentication import get_current_user_authorizer
-from app.api.dependencies.projects import get_project_by_id_from_path, check_project_ownership
-from app.api.dependencies.database import get_repository
-from app.database.repositories.projects import ProjectsRepository
-from app.models.users import User
-from app.models.projects import ProjectDomain
-from app.schemas import ProjectInCreate, ProjectInResponse, ListOfProjectsInResponse, ProjectInUpdate
-from app.resourses import strings
-from app.database.errors import EntityDoesNotExist
 
-router = APIRouter()
+from app.api.dependencies.authentication import CurrentUser
+from app.api.dependencies.services import ProjectsServiceDep, TasksServiceDep
+from app.schemas.projects import ProjectCreateRequest, ProjectData
+from app.schemas.response import TodoistResponse, ListData
+from app.schemas.tasks import TaskData
+
+router = APIRouter(
+    prefix="/projects",
+    tags=["Projects"]
+)
 
 
 @router.post(
     "",
     status_code=status.HTTP_201_CREATED,
-    response_model=ProjectInResponse,
+    response_model=TodoistResponse[ProjectData],
     name="projects:create-project"
 )
 async def create_new_project(
-    project_create: ProjectInCreate = Body(...),
-    project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository)),
-    user: User = Depends(get_current_user_authorizer())
-) -> ProjectInResponse:
-    try:
-        if await project_repo.get_project_by_title(title=project_create.title):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=strings.PROJECT_ALREADY_EXISTS,
-            )
-    except EntityDoesNotExist:
-        pass
-
-    project = await project_repo.create_project(title=project_create.title, owner_id=user.id)
-
-    return ProjectInResponse(**project.dict())
-
-
-@router.get(
-    "",
-    response_model=ListOfProjectsInResponse,
-    name="projects:list-project"
-)
-async def list_projects(
-    project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository)),
-    user: User = Depends(get_current_user_authorizer())
-) -> ListOfProjectsInResponse:
-    projects = await project_repo.get_all_projects_by_owner_id(owner_id=user.id)
-
-    projects_for_response = [
-        ProjectInResponse(**project.dict()) for project in projects
-    ]
-
-    return ListOfProjectsInResponse(
-        projects=projects_for_response,
-        count=len(projects_for_response)
+        create_request: ProjectCreateRequest,
+        project_repo: ProjectsServiceDep,
+        current_user: CurrentUser
+) -> TodoistResponse[ProjectData]:
+    project = project_repo.create_project(
+        current_user.id,
+        create_request.title,
+        create_request.description,
+        create_request.color,
+    )
+    return TodoistResponse[ProjectData](
+        success=True,
+        data=ProjectData(
+            uid=project.uid,
+            title=project.title,
+            description=project.description,
+            color=project.color,
+            tasks=[]
+        ),
     )
 
 
 @router.get(
-    '/{project_id}',
-    response_model=ProjectInResponse,
-    name="projects:get-project",
-    dependencies=[Depends(check_project_ownership)]
+    "/{project_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=TodoistResponse[ProjectData],
+    name="projects:get_all_projects"
 )
-async def retrieve_project_by_id(
-    project: ProjectDomain = Depends(get_project_by_id_from_path),
-) -> ProjectInResponse:
-    return ProjectInResponse(**project.dict())
+async def get_all_projects(
+        project_repo: ProjectsServiceDep,
+        current_user: CurrentUser
+) -> TodoistResponse[ListData[ProjectData]]:
+    projects = await project_repo.retrieve_all_projects(current_user.id)
+
+    return TodoistResponse[ListData[ProjectData]](
+        success=True,
+        data=ListData(
+            count=len(projects),
+            items=[
+                ProjectData(
+                    uid=project.uid,
+                    title=project.title,
+                    description=project.description,
+                    color=project.color,
+                    tasks=[]
+                ) for project in projects
+            ],
+        )
+    )
+
+
+@router.get(
+    "/{project_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=TodoistResponse[ProjectData],
+    name="projects:get-project"
+)
+async def get_project(
+        project_id: str,
+        project_service: ProjectsServiceDep,
+        tasks_service: TasksServiceDep,
+        current_user: CurrentUser
+) -> TodoistResponse[ProjectData]:
+    project = await project_service.retrieve_project(current_user.id, project_id)
+    tasks = await tasks_service.retrieve_all_tasks(project_id)
+
+    return TodoistResponse[ProjectData](
+        success=True,
+        data=ProjectData(
+            uid=project.uid,
+            title=project.title,
+            description=project.description,
+            color=project.color,
+            tasks=[
+                TaskData(
+                    uid=task.uid,
+                    content=task.content,
+                    created_at=task.created_at,
+                    updated_at=task.updated_at,
+                    scheduled_at=task.scheduled_at,
+                    is_finished=task.is_finished,
+                ) for task in tasks
+            ]
+        )
+    )
 
 
 @router.put(
     '/{project_id}',
-    response_model=ProjectInResponse,
+    status_code=status.HTTP_200_OK,
+    response_model=TodoistResponse[ProjectData],
     name="project:update-project",
-    dependencies=[Depends(check_project_ownership)]
 )
 async def update_project_by_id(
-    project_update: ProjectInUpdate = Body(...),
-    project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository)),
-    project: ProjectDomain = Depends(get_project_by_id_from_path),
-) -> ProjectInResponse:
-    new_project = await project_repo.update_project(
-        project=project,
-        **project_update.dict()
-    )
+        project_id: str,
+        project_service: ProjectsServiceDep,
+        tasks_service: TasksServiceDep,
+        current_user: CurrentUser
+) -> TodoistResponse[ProjectData]:
+    project = await project_service.update_project(current_user.id, project_id)
+    tasks = await tasks_service.retrieve_all_tasks(project_id)
 
-    return ProjectInResponse(**new_project.dict())
+    return TodoistResponse[ProjectData](
+        success=True,
+        data=ProjectData(
+            uid=project.uid,
+            title=project.title,
+            description=project.description,
+            color=project.color,
+            tasks=[
+                TaskData(
+                    uid=task.uid,
+                    content=task.content,
+                    created_at=task.created_at,
+                    updated_at=task.updated_at,
+                    scheduled_at=task.scheduled_at,
+                    is_finished=task.is_finished,
+                ) for task in tasks
+            ]
+        )
+    )
 
 
 @router.delete(
     '/{project_id}',
-    status_code=status.HTTP_204_NO_CONTENT,
-    name="project:remove-project",
-    dependencies=[Depends(check_project_ownership)],
-    response_class=Response
+    status_code=status.HTTP_200_OK,
+    name="project:delete-project",
+    response_model=TodoistResponse
 )
-async def remove_project(
-    project: ProjectDomain = Depends(get_project_by_id_from_path),
-    project_repo: ProjectsRepository = Depends(get_repository(ProjectsRepository))
-) -> None:
-    await project_repo.remove_project(project=project)
+async def delete_project(
+        project_id: str,
+        project_service: ProjectsServiceDep,
+        current_user: CurrentUser
+) -> TodoistResponse:
+    await project_service.remove_project(current_user, project_id)
+    return TodoistResponse(
+        success=True,
+    )

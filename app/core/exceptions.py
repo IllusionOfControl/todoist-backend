@@ -45,6 +45,11 @@ class ProjectNotFoundException(BaseInternalException):
     _message = "project with this id does not exist."
 
 
+class ProjectPermissionException(BaseInternalException):
+    _status_code = 403
+    _message = "you do not have permission to access this project."
+
+
 class EmailAlreadyTakenException(BaseInternalException):
     _status_code = 400
     _message = "email is already taken."

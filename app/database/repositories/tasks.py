@@ -5,6 +5,8 @@ from sqlalchemy import select, insert, update, delete
 from app.database.repositories.base import BaseRepository
 from app.models.tasks import Task
 
+__all__ = ["TasksRepository"]
+
 
 class TasksRepository(BaseRepository):
     async def get_all_by_project(self, project_id: int) -> list[Task]:

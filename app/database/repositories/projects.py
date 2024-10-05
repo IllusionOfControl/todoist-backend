@@ -7,19 +7,21 @@ from app.models.projects import Project
 from app.models.tasks import Task
 
 
-class ProjectsRepository(BaseRepository):
+class ProjectRepository(BaseRepository):
     async def create(
             self,
             uuid: str,
             title: str,
             description: str,
-            owner_id: int
+            owner_id: int,
+            color: int
     ) -> Project:
         query = insert(Project).values(
             uuid=uuid,
             title=title,
             description=description,
-            owner_id=owner_id
+            owner_id=owner_id,
+            color=color
         ).returning(Project)
 
         result = await self._session.execute(query)

@@ -23,7 +23,7 @@ class Database:
         self._session = None
 
     def connect(self, settings: DatabaseSettings) -> None:
-        self._engine = create_async_engine(str(settings.url.unicode_string()), echo=True)
+        self._engine = create_async_engine(str(settings.url.unicode_string()), echo=True, pool_size=10, pool_recycle=3600)
         self._session = async_sessionmaker(
             autocommit=False,
             autoflush=False,
@@ -36,6 +36,13 @@ class Database:
     async def create_database(self) -> None:
         async with self._engine.begin() as conn:
             conn.run_sync(Base.metadata.create_all)
+
+    async def check_connection(self) -> None:
+        from sqlalchemy import select
+
+        session: AsyncSession = self._session()
+        await session.execute(select(1))
+
 
     @asynccontextmanager
     async def session(self) -> Callable[..., AbstractContextManager[AsyncSession]]:

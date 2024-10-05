@@ -39,13 +39,16 @@ class Application:
             f"Starting Application {self._settings.server.title} {self._settings.server.version}"
         )
 
+        logger.info("Connecting to a PostgreSQL database.")
         database.connect(self._settings.database)
+        await database.check_connection()
 
         logger.info(f"Server Url: {self._settings.server.base_url}")
         logger.info(f"Docs Url: {self._settings.server.base_url}{self._settings.server.docs_url}")
 
         yield
 
+        logger.info("Closing the database connection.")
         database.close()
 
         logger.info(

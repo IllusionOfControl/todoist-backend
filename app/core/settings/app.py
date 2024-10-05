@@ -11,7 +11,7 @@ from app.core.settings.base import BaseAppSettings
 
 class ServerSettings(BaseModel):
     debug: bool = False
-    base_url: str = 'localhost'
+    base_url: str = 'http://localhost:8000'
     docs_url: str = "/docs"
     openapi_prefix: str = ""
     openapi_url: str = "/openapi.json"

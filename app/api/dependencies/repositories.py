@@ -3,7 +3,9 @@ from typing import Annotated
 from fastapi import Depends
 
 from app.api.dependencies.database import DatabaseSessionDep
-from app.database.repositories import TasksRepository, ProjectRepository, UsersRepository
+from app.database.repositories.tasks import TasksRepository
+from app.database.repositories.projects import ProjectRepository
+from app.database.repositories.users import UsersRepository
 
 
 def get_user_repository(

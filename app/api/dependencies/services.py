@@ -5,7 +5,7 @@ from fastapi import Depends
 from app.api.dependencies.repositories import UsersRepositoryDep, TasksRepositoryDep, ProjectsRepositoryDep
 from app.core.config import get_app_settings
 from app.core.settings.app import AppSettings
-from app.services import ProjectsService
+from app.services.projects import ProjectsService
 from app.services.authentication import AuthenticationService
 from app.services.jwt import JWTService
 from app.services.tasks import TaskService

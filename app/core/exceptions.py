@@ -45,6 +45,11 @@ class ProjectNotFoundException(BaseInternalException):
     _message = "project with this id does not exist."
 
 
+class IncorrectJWTTokenException(BaseInternalException):
+    _status_code = 403
+    _message = "invalid JWT token."
+
+
 class ProjectPermissionException(BaseInternalException):
     _status_code = 403
     _message = "you do not have permission to access this project."

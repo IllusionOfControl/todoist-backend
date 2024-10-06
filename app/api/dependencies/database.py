@@ -7,7 +7,7 @@ from app.database.database import database
 
 
 async def get_database_session() -> AsyncSession:
-    async with database.session() as session:
+    async with database.context_session() as session:
         yield session
 
 

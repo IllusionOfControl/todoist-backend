@@ -11,13 +11,14 @@ class TaskService:
     def __init__(self, tasks_repository: TasksRepository):
         self._tasks_repository = tasks_repository
 
-    async def create_task(self, project_id: int, content: str,
+    async def create_task(self, project_id: int, content: str, is_finished: bool,
                           scheduled_at: date | None) -> TaskData:
 
         task = await self._tasks_repository.create_task(
             uuid.uuid4().hex,
             content,
             project_id,
+            is_finished,
             scheduled_at,
         )
         return TaskData(

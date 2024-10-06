@@ -1,4 +1,5 @@
-from app.core.exceptions import UserNotFoundException, IncorrectLoginInputException, UsernameAlreadyTakenException, EmailAlreadyTakenException
+from app.core.exceptions import UserNotFoundException, IncorrectLoginInputException, UsernameAlreadyTakenException, \
+    EmailAlreadyTakenException, IncorrectJWTTokenException
 from app.core.secutiry import verify_password
 from app.database.repositories.users import UsersRepository
 from app.models.users import User
@@ -26,7 +27,7 @@ class AuthenticationService:
         if not verify_password(user.password_salt + password, user.password_hash):
             raise IncorrectLoginInputException()
 
-        token = self._jwt_service.create_access_token_for_user(user)
+        token = self._jwt_service.create_access_token_for_user(user.uid)
 
         # TODO: Make refresh token
         return token
@@ -45,9 +46,7 @@ class AuthenticationService:
         )
 
         # TODO: Make refresh token
-        token = self._jwt_service.create_access_token_for_user(
-            user,
-        )
+        token = self._jwt_service.create_access_token_for_user(user.uid)
         return token
 
     async def get_current_user(self, token: str) -> User:
@@ -55,5 +54,4 @@ class AuthenticationService:
         if user := await self._user_repository.get_by_uid(user_uid):
             return user
         else:
-            raise IncorrectLoginInputException()
-
+            raise IncorrectJWTTokenException()

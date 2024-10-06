@@ -27,7 +27,7 @@ class JWTService(Protocol):
         to_encode.update(JWTMeta(exp=expire, sub=JWT_SUBJECT).dict())
         return jwt.encode(to_encode, secret_key, algorithm=ALGORITHM)
 
-    def create_access_token_for_user(self, user_uid) -> str:
+    def create_access_token_for_user(self, user_uid: str) -> str:
         return self.create_jwt_token(
             jwt_content=JWTUser(uid=user_uid).model_dump(),
             secret_key=self._secret_key,

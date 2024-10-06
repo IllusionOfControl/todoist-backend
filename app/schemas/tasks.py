@@ -19,16 +19,18 @@ class TaskToUpdate(BaseModel):
     scheduled_at: date | None = Field(None, description="schedule date")
 
 
+class TaskToCreate(BaseModel):
+    content: str = Field(..., description="task content")
+    is_finished: bool = Field(..., description="is finished flag")
+    scheduled_at: date | None = Field(None, description="schedule date")
+
+
 class TaskInResponse(BaseModel):
     id: str
     project_id: int
     title: str = Field(title="Task title")
     is_finished: bool = Field(default=False, title="Is finished")
     scheduled_at: Optional[date] = ""
-
-
-class TaskInCreate(BaseModel):
-    title: str
 
 
 class TaskInUpdate(BaseModel):

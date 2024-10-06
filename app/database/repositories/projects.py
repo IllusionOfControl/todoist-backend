@@ -17,18 +17,18 @@ class ProjectRepository(BaseRepository):
             color: int
     ) -> Project:
         query = insert(Project).values(
-            uuid=uuid,
+            uid=uuid,
             title=title,
             description=description,
             owner_id=owner_id,
-            color=color
+            color=color,
         ).returning(Project)
 
         result = await self._session.execute(query)
         return result.scalar()
 
-    async def get_by_uid(self, uuid: str) -> Project:
-        query = select(Project).where(Project.uuid == uuid)
+    async def get_by_uid(self, uid: str) -> Project:
+        query = select(Project).where(Project.uid == uid)
         return await self._session.scalar(query)
 
     async def get_all_by_owner(self, owner_id: int) -> list[Project]:

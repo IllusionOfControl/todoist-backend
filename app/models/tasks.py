@@ -15,6 +15,5 @@ class Task(Base):
     content: Mapped[str] = mapped_column(nullable=False)
     is_finished: Mapped[bool] = mapped_column(default=False)
     scheduled_at: Mapped[date] = mapped_column(nullable=True, default=None)
-    created_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.now())

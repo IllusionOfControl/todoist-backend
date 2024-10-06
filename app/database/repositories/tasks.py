@@ -24,15 +24,17 @@ class TasksRepository(BaseRepository):
 
     async def create_task(
             self,
-            uuid: str,
+            uid: str,
             content: str,
             project_id: int,
+            is_finished: bool,
             scheduled_at: date,
     ) -> Task:
         query = insert(Task).values(
-            uuid=uuid,
+            uid=uid,
             content=content,
             project_id=project_id,
+            is_finished=is_finished,
             scheduled_at=scheduled_at,
         ).returning(Task)
         result = await self._session.execute(query)

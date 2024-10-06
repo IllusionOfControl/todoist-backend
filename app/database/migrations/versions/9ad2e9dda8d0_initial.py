@@ -34,17 +34,17 @@ def upgrade() -> None:
     )
     op.create_table('projects',
     sa.Column('id', sa.INTEGER(), server_default=sa.text("nextval('projects_id_seq'::regclass)"), autoincrement=True, nullable=False),
-    sa.Column('uuid', sa.VARCHAR(), autoincrement=False, nullable=False),
+    sa.Column('uid', sa.VARCHAR(), autoincrement=False, nullable=False),
     sa.Column('owner_id', sa.INTEGER(), autoincrement=False, nullable=False),
     sa.Column('title', sa.VARCHAR(), autoincrement=False, nullable=False),
     sa.Column('description', sa.VARCHAR(), autoincrement=False, nullable=False),
     sa.Column('color', sa.INTEGER(), autoincrement=False, nullable=False),
     sa.Column('created_at', postgresql.TIMESTAMP(), server_default=sa.text('now()'), autoincrement=False, nullable=False),
-    sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False, nullable=False),
+    sa.Column('updated_at', postgresql.TIMESTAMP(), server_default=sa.text('now()'), autoincrement=False, nullable=False),
     sa.ForeignKeyConstraint(['owner_id'], ['users.id'], name='projects_owner_id_fkey'),
     sa.PrimaryKeyConstraint('id', name='projects_pkey'),
     sa.UniqueConstraint('owner_id', name='projects_owner_id_key'),
-    sa.UniqueConstraint('uuid', name='projects_uuid_key'),
+    sa.UniqueConstraint('uid', name='projects_uid_key'),
     postgresql_ignore_search_path=False
     )
     op.create_table('tasks',
@@ -54,10 +54,8 @@ def upgrade() -> None:
     sa.Column('content', sa.VARCHAR(), autoincrement=False, nullable=False),
     sa.Column('is_finished', sa.BOOLEAN(), autoincrement=False, nullable=False),
     sa.Column('scheduled_at', sa.DATE(), autoincrement=False, nullable=True),
-    sa.Column('created_by', sa.INTEGER(), autoincrement=False, nullable=False),
     sa.Column('created_at', postgresql.TIMESTAMP(), server_default=sa.text('now()'), autoincrement=False, nullable=False),
-    sa.Column('updated_at', postgresql.TIMESTAMP(), autoincrement=False, nullable=False),
-    sa.ForeignKeyConstraint(['created_by'], ['users.id'], name='tasks_created_by_fkey'),
+    sa.Column('updated_at', postgresql.TIMESTAMP(), server_default=sa.text('now()'), autoincrement=False, nullable=False),
     sa.ForeignKeyConstraint(['project_id'], ['projects.id'], name='tasks_project_id_fkey'),
     sa.PrimaryKeyConstraint('id', name='tasks_pkey'),
     sa.UniqueConstraint('uid', name='tasks_uid_key')

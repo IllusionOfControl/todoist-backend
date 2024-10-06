@@ -14,13 +14,13 @@ router = APIRouter(
 @router.post(
     '/signin',
     status_code=HTTP_200_OK,
-    response_model=TodoistResponse[SignInData],
+    response_model_exclude_none=True,
 )
 async def sign_in(
         authentication_service: AuthenticationServiceDep,
         request: SignInRequest,
 ) -> TodoistResponse[SignInData]:
-    access_token = await authentication_service.sign_in_user(request)
+    access_token = await authentication_service.sign_in_user(request.username, request.password)
     return TodoistResponse[SignInData](
         success=True,
         data=SignInData(
@@ -32,7 +32,7 @@ async def sign_in(
 @router.post(
     '/signup',
     status_code=HTTP_201_CREATED,
-    response_model=TodoistResponse[SignInData],
+    response_model_exclude_none=True,
 )
 async def sign_up(
         authentication_service: AuthenticationServiceDep,

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from app.schemas import TaskInResponse, ListOfTasksInResponse
-from app.models.users import User
+from app.models import User
 from app.database.repositories.tasks import TasksRepository
 from app.api.dependencies.authentication import get_current_user_authorizer
 from app.api.dependencies.database import get_repository

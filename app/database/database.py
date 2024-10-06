@@ -35,14 +35,13 @@ class Database:
 
     async def create_database(self) -> None:
         async with self._engine.begin() as conn:
-            conn.run_sync(Base.metadata.create_all)
+            await conn.run_sync(Base.metadata.create_all)
 
     async def check_connection(self) -> None:
         from sqlalchemy import select
 
         session: AsyncSession = self._session()
         await session.execute(select(1))
-
 
     @asynccontextmanager
     async def session(self) -> Callable[..., AbstractContextManager[AsyncSession]]:

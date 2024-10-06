@@ -44,10 +44,11 @@ class Database:
         await session.execute(select(1))
 
     @asynccontextmanager
-    async def session(self) -> Callable[..., AbstractContextManager[AsyncSession]]:
+    async def context_session(self) -> Callable[..., AbstractContextManager[AsyncSession]]:
         session: AsyncSession = self._session()
         try:
             yield session
+            await session.commit()
         except Exception:
             logger.exception("Session rollback because of exception")
             await session.rollback()

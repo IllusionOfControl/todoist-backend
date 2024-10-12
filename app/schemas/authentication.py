@@ -2,12 +2,12 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class SignInRequest(BaseModel):
-    username: str
-    password: str
+    username: str = Field(..., description='user`s username')
+    password: str = Field(..., description='user`s password')
 
 
 class SignInData(BaseModel):
-    access_token: str
+    access_token: str = Field(..., description='jwt access token')
     # refresh_token: str
 
 

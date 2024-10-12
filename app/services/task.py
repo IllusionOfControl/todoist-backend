@@ -18,7 +18,7 @@ class TaskService:
                           scheduled_at: date | None) -> TaskData:
         project = await self._projects_service.retrieve_project(current_user.id, project_uid)
 
-        task = await self._tasks_repository.create_task(
+        task = await self._tasks_repository.create(
             uuid.uuid4().hex,
             content,
             project.id,
@@ -51,7 +51,7 @@ class TaskService:
         if not task:
             raise TaskNotFoundException()
 
-        task = await self._tasks_repository.update_task(
+        task = await self._tasks_repository.update(
             task.uid,
             content,
             is_finished,

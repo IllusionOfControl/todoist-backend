@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from starlette import status
 
-from app.api.dependencies.authentication import CurrentUser
+from app.api.dependencies.authentication import CurrentUserDep
 from app.api.dependencies.services import TaskServiceDep, ProjectServiceDep
 from app.schemas.response import TodoistResponse, ListData
-from app.schemas.tasks import TaskData, TaskToUpdate, TaskToCreate
+from app.schemas.tasks import TaskData, TaskEditRequest
 
 router = APIRouter(
     prefix="/projects/{project_uid}/tasks",
@@ -22,7 +22,7 @@ async def get_all_tasks(
         project_uid: str,
         projects_service: ProjectServiceDep,
         tasks_service: TaskServiceDep,
-        current_user: CurrentUser
+        current_user: CurrentUserDep
 ) -> TodoistResponse[ListData[TaskData]]:
     project = await projects_service.retrieve_project(current_user.id, project_uid)
     tasks = await tasks_service.retrieve_all_tasks(project.id)
@@ -53,11 +53,11 @@ async def get_all_tasks(
 )
 async def create_task(
         project_uid: str,
-        task_to_create: TaskToCreate,
+        task_to_create: TaskEditRequest,
         tasks_service: TaskServiceDep,
-        current_user: CurrentUser
+        current_user: CurrentUserDep
 ) -> TodoistResponse[TaskData]:
-    task = await tasks_service.create_task(
+    task = await tasks_service.create(
         current_user,
         project_uid,
         task_to_create.content,
@@ -87,7 +87,7 @@ async def get_task(
         project_uid: str,
         task_uid: str,
         tasks_service: TaskServiceDep,
-        current_user: CurrentUser
+        current_user: CurrentUserDep
 ) -> TodoistResponse[TaskData]:
     task = await tasks_service.retrieve_task(current_user, project_uid, task_uid)
 
@@ -113,7 +113,7 @@ async def delete_task(
         project_uid: str,
         task_uid: str,
         tasks_service: TaskServiceDep,
-        current_user: CurrentUser
+        current_user: CurrentUserDep
 ) -> TodoistResponse[TaskData]:
     task = await tasks_service.delete_task(current_user, project_uid, task_uid)
 
@@ -138,11 +138,11 @@ async def delete_task(
 async def update_task(
         project_uid: str,
         task_uid: str,
-        task_to_update: TaskToUpdate,
+        task_to_update: TaskEditRequest,
         task_service: TaskServiceDep,
-        current_user: CurrentUser,
+        current_user: CurrentUserDep,
 ) -> TodoistResponse[TaskData]:
-    updated_task = await task_service.update_task(
+    updated_task = await task_service.update(
         current_user, project_uid, task_uid, task_to_update
     )
     return TodoistResponse(

@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from starlette import status
 
-from app.api.dependencies.authentication import CurrentUser
+from app.api.dependencies.authentication import CurrentUserDep
 from app.api.dependencies.services import ProjectServiceDep, TaskServiceDep
-from app.schemas.projects import ProjectCreateRequest, ProjectData
+from app.schemas.projects import ProjectEditRequest, ProjectData
 from app.schemas.response import TodoistResponse, ListData
 from app.schemas.tasks import TaskData
 
@@ -20,9 +20,9 @@ router = APIRouter(
     name="Create a new project",
 )
 async def create_new_project(
-        create_request: ProjectCreateRequest,
+        create_request: ProjectEditRequest,
         project_service: ProjectServiceDep,
-        current_user: CurrentUser
+        current_user: CurrentUserDep
 ) -> TodoistResponse[ProjectData]:
     project = await project_service.create_project(
         current_user.id,
@@ -37,7 +37,6 @@ async def create_new_project(
             title=project.title,
             description=project.description,
             color=project.color,
-            tasks=[]
         ),
     )
 
@@ -50,7 +49,7 @@ async def create_new_project(
 )
 async def get_all_projects(
         project_service: ProjectServiceDep,
-        current_user: CurrentUser
+        current_user: CurrentUserDep
 ) -> TodoistResponse[ListData[ProjectData]]:
     projects = await project_service.retrieve_all_projects(current_user.id)
 
@@ -64,7 +63,6 @@ async def get_all_projects(
                     title=project.title,
                     description=project.description,
                     color=project.color,
-                    tasks=[]
                 ) for project in projects
             ],
         )
@@ -80,11 +78,9 @@ async def get_all_projects(
 async def get_project(
         project_uid: str,
         project_service: ProjectServiceDep,
-        tasks_service: TaskServiceDep,
-        current_user: CurrentUser
+        current_user: CurrentUserDep
 ) -> TodoistResponse[ProjectData]:
     project = await project_service.retrieve_project(current_user.id, project_uid)
-    tasks = await tasks_service.retrieve_all_tasks(project_uid)
 
     return TodoistResponse(
         success=True,
@@ -93,16 +89,6 @@ async def get_project(
             title=project.title,
             description=project.description,
             color=project.color,
-            tasks=[
-                TaskData(
-                    uid=task.uid,
-                    content=task.content,
-                    created_at=task.created_at,
-                    updated_at=task.updated_at,
-                    scheduled_at=task.scheduled_at,
-                    is_finished=task.is_finished,
-                ) for task in tasks
-            ]
         )
     )
 
@@ -116,11 +102,9 @@ async def get_project(
 async def update_project_by_id(
         project_uid: str,
         project_service: ProjectServiceDep,
-        tasks_service: TaskServiceDep,
-        current_user: CurrentUser
+        current_user: CurrentUserDep
 ) -> TodoistResponse[ProjectData]:
     project = await project_service.update_project(current_user.id, project_uid)
-    tasks = await tasks_service.retrieve_all_tasks(project_uid)
 
     return TodoistResponse(
         success=True,
@@ -129,16 +113,6 @@ async def update_project_by_id(
             title=project.title,
             description=project.description,
             color=project.color,
-            tasks=[
-                TaskData(
-                    uid=task.uid,
-                    content=task.content,
-                    created_at=task.created_at,
-                    updated_at=task.updated_at,
-                    scheduled_at=task.scheduled_at,
-                    is_finished=task.is_finished,
-                ) for task in tasks
-            ]
         )
     )
 
@@ -152,7 +126,7 @@ async def update_project_by_id(
 async def delete_project(
         project_uid: str,
         project_service: ProjectServiceDep,
-        current_user: CurrentUser
+        current_user: CurrentUserDep
 ) -> TodoistResponse:
     await project_service.remove_project(current_user, project_uid)
     return TodoistResponse(

@@ -1,5 +1,6 @@
-from app.core.settings.app import AppSettings
 import logging
+
+from app.core.settings.app import AppSettings
 
 
 class ProdAppSettings(AppSettings):

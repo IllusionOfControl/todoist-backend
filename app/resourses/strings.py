@@ -15,7 +15,7 @@ WRONG_TOKEN_PREFIX = "unsupported authorization type"
 MALFORMED_PAYLOAD = "could not validate credentials"
 AUTHENTICATION_REQUIRED = "authentication required"
 
-#==
+# ==
 # UNABLE_TO_FOLLOW_YOURSELF = "user can not follow him self"
 # UNABLE_TO_UNSUBSCRIBE_FROM_YOURSELF = "user can not unsubscribe from him self"
 # USER_IS_NOT_FOLLOWED = "you don't follow this user"

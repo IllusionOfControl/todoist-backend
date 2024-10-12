@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import insert, select, update, delete
+from sqlalchemy import delete, insert, select, update
 
 from app.database.repositories.base import BaseRepository
 from app.models.project import Project
@@ -9,20 +9,19 @@ from app.models.task import Task
 
 class ProjectRepository(BaseRepository):
     async def create(
-            self,
-            uuid: str,
-            title: str,
-            description: str,
-            owner_id: int,
-            color: int
+        self, uuid: str, title: str, description: str, owner_id: int, color: int
     ) -> Project:
-        query = insert(Project).values(
-            uid=uuid,
-            title=title,
-            description=description,
-            owner_id=owner_id,
-            color=color,
-        ).returning(Project)
+        query = (
+            insert(Project)
+            .values(
+                uid=uuid,
+                title=title,
+                description=description,
+                owner_id=owner_id,
+                color=color,
+            )
+            .returning(Project)
+        )
 
         result = await self._session.execute(query)
         return result.scalar()
@@ -37,15 +36,14 @@ class ProjectRepository(BaseRepository):
         return list(result.scalars())
 
     async def update(
-            self,
-            uid: str,
-            title: str,
-            description: str,
-            color: int,
+        self, uid: str, title: str, description: str, color: int
     ) -> Project:
-        query = update(Project).where(Task.uid == uid).values(
-            updated_at=datetime.now()
-        ).returning(Project)
+        query = (
+            update(Project)
+            .where(Task.uid == uid)
+            .values(updated_at=datetime.now())
+            .returning(Project)
+        )
 
         if title:
             query.values(title=title)

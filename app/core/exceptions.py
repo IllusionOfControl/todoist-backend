@@ -9,10 +9,15 @@ from app.schemas.response import TodoistResponse
 
 class BaseInternalException(Exception):
     _status_code: int = 0
-    _message: str = ''
+    _message: str = ""
     _errors: Iterable[str] | None = None
 
-    def __init__(self, status_code: int | None = None, message: str | None = None, errors: Iterable[str] = None):
+    def __init__(
+        self,
+        status_code: int | None = None,
+        message: str | None = None,
+        errors: Iterable[str] = None,
+    ):
         self._status_code = status_code or self._status_code
         self._message = message or self._message
         self._errors = errors or self._errors
@@ -73,30 +78,26 @@ class UsernameAlreadyTakenException(BaseInternalException):
 def add_internal_exception_handler(app: FastAPI) -> None:
     @app.exception_handler(BaseInternalException)
     async def _exception_handler(
-            _: Request, exc: BaseInternalException
+        _: Request, exc: BaseInternalException
     ) -> JSONResponse:
         return JSONResponse(
             status_code=exc.status_code,
             content=TodoistResponse(
-                success=False,
-                message=exc.message,
-                errors=exc.errors
-            )
+                success=False, message=exc.message, errors=exc.errors
+            ),
         )
 
 
 def add_request_exception_handler(app: FastAPI) -> None:
     @app.exception_handler(RequestValidationError)
     async def _exception_handler(
-            _: Request, exc: RequestValidationError
+        _: Request, exc: RequestValidationError
     ) -> JSONResponse:
         return JSONResponse(
             status_code=422,
             content=TodoistResponse(
-                success=False,
-                message="schema validation error",
-                errors=exc.errors(),
-            )
+                success=False, message="schema validation error", errors=exc.errors()
+            ),
         )
 
 

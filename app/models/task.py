@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import date, datetime
 
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column
@@ -7,7 +7,7 @@ from app.database import Base
 
 
 class Task(Base):
-    __tablename__ = 'tasks'
+    __tablename__ = "tasks"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     uid: Mapped[str] = mapped_column(unique=True)
@@ -16,4 +16,6 @@ class Task(Base):
     is_finished: Mapped[bool] = mapped_column(default=False)
     scheduled_at: Mapped[date] = mapped_column(nullable=True, default=None)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        nullable=False, server_default=func.now()
+    )

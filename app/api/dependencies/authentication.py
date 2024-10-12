@@ -6,7 +6,12 @@ from app.api.dependencies.services import AuthenticationServiceDep
 from app.core.security import TodoistTokenHeader
 from app.models.user import User
 
-__all__ = ["JWTTokenDep", "JWTTokenOptionalDep", "CurrentUserDep", "CurrentOptionalUserDep"]
+__all__ = [
+    "JWTTokenDep",
+    "JWTTokenOptionalDep",
+    "CurrentUserDep",
+    "CurrentOptionalUserDep",
+]
 
 token_security = TodoistTokenHeader(
     name="Authorization",
@@ -25,14 +30,16 @@ JWTTokenDep = Annotated[str, Depends(token_security)]
 JWTTokenOptionalDep = Annotated[str, Depends(token_security_optional)]
 
 
-async def get_current_user_or_none(token: JWTTokenOptionalDep, user_service: AuthenticationServiceDep):
+async def get_current_user_or_none(
+    token: JWTTokenOptionalDep, user_service: AuthenticationServiceDep
+):
     if token:
         current_user = await user_service.get_current_user(token=token)
         return current_user
 
 
 async def get_current_user(
-        token: JWTTokenDep, user_service: AuthenticationServiceDep
+    token: JWTTokenDep, user_service: AuthenticationServiceDep
 ) -> User:
     current_user = await user_service.get_current_user(token=token)
     return current_user

@@ -7,7 +7,7 @@ from app.database import Base
 
 
 class Project(Base):
-    __tablename__ = 'projects'
+    __tablename__ = "projects"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     uid: Mapped[str] = mapped_column(unique=True)

@@ -3,7 +3,7 @@ import sys
 from typing import Any, Dict, List
 
 from loguru import logger
-from pydantic import BaseModel, field_validator, PostgresDsn, SecretStr
+from pydantic import BaseModel, PostgresDsn, SecretStr, field_validator
 
 from app.core.logging import InterceptHandler
 from app.core.settings.base import BaseAppSettings
@@ -11,7 +11,7 @@ from app.core.settings.base import BaseAppSettings
 
 class ServerSettings(BaseModel):
     debug: bool = False
-    base_url: str = 'http://localhost:8000'
+    base_url: str = "http://localhost:8000"
     openapi_docs_url: str = "/docs"
     openapi_prefix: str = ""
     openapi_spec_url: str = "/openapi.json"
@@ -72,10 +72,8 @@ class LoggingSettings(BaseModel):
             logging_logger.handlers = [InterceptHandler(level=self.level)]
 
         logger.configure(
-            handlers=[
-                {"sink": sys.stderr, "level": self.level}
-            ],
-            extra={"request_id": ""}
+            handlers=[{"sink": sys.stderr, "level": self.level}],
+            extra={"request_id": ""},
         )
 
 
@@ -84,5 +82,3 @@ class AppSettings(BaseAppSettings):
     database: DatabaseSettings
     security: SecuritySettings
     logging: LoggingSettings = LoggingSettings()
-
-

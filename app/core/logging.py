@@ -1,6 +1,7 @@
 import logging
 from types import FrameType
 from typing import cast
+
 from loguru import logger
 
 
@@ -17,6 +18,5 @@ class InterceptHandler(logging.Handler):
             depth += 1
 
         logger.opt(depth=depth, exception=record.exc_info).log(
-            level,
-            record.getMessage(),
+            level, record.getMessage()
         )

@@ -1,5 +1,1 @@
-from .authentication import (
-    SignUpRequest,
-    SignInRequest,
-    SignInData,
-)
+from .authentication import SignInData, SignInRequest, SignUpRequest

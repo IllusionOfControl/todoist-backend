@@ -6,19 +6,18 @@ from app.models.project import Project
 
 
 class ProjectService:
-    def __init__(
-            self,
-            project_repo: ProjectRepository,
-    ):
+    def __init__(self, project_repo: ProjectRepository):
         self._project_repo = project_repo
 
-    async def create_project(self, owner_id: int, title: str, description: str, color: int) -> Project:
+    async def create_project(
+        self, owner_id: int, title: str, description: str, color: int
+    ) -> Project:
         project = await self._project_repo.create(
             uuid=uuid.uuid4().hex,
             title=title,
             description=description,
             owner_id=owner_id,
-            color=color
+            color=color,
         )
         return project
 
@@ -44,7 +43,9 @@ class ProjectService:
 
         await self._project_repo.delete(project_uid)
 
-    async def update_project(self, owner_id, project_uid: str, title: str, description: str, color: int) -> Project:
+    async def update_project(
+        self, owner_id, project_uid: str, title: str, description: str, color: int
+    ) -> Project:
         project = await self._project_repo.get_by_uid(project_uid)
 
         if project is None:
@@ -52,5 +53,7 @@ class ProjectService:
         if owner_id.id != project.owner_id:
             raise ProjectPermissionException()
 
-        project = await self._project_repo.update(project_uid, title, description, color)
+        project = await self._project_repo.update(
+            project_uid, title, description, color
+        )
         return project

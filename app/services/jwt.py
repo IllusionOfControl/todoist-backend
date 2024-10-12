@@ -18,9 +18,7 @@ class JWTService(Protocol):
 
     @staticmethod
     def create_jwt_token(
-            jwt_content: Dict[str, str],
-            secret_key: str,
-            expires_delta: timedelta,
+        jwt_content: Dict[str, str], secret_key: str, expires_delta: timedelta
     ) -> str:
         to_encode = jwt_content.copy()
         expire = datetime.utcnow() + expires_delta
@@ -36,7 +34,9 @@ class JWTService(Protocol):
 
     def get_user_uid_from_token(self, token: str) -> str:
         try:
-            return JWTUser(**jwt.decode(token, self._secret_key, algorithms=[ALGORITHM])).uid
+            return JWTUser(
+                **jwt.decode(token, self._secret_key, algorithms=[ALGORITHM])
+            ).uid
         except jwt.PyJWTError as decode_error:
             raise ValueError("unable to decode JWT token") from decode_error
         except ValidationError as validation_error:

@@ -1,5 +1,6 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Protocol
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class BaseRepository:

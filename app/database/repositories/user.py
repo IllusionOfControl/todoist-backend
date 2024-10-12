@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import select, insert, delete
+from sqlalchemy import delete, insert, select
 
 from app.core.secutiry import generate_salt, get_password_hash
 from app.database.repositories.base import BaseRepository
@@ -26,20 +26,19 @@ class UserRepository(BaseRepository):
         if user := await self._session.scalar(query):
             return user
 
-    async def create(
-            self,
-            username: str,
-            email: str,
-            password: str
-    ) -> User:
+    async def create(self, username: str, email: str, password: str) -> User:
         password_salt = generate_salt()
-        query = insert(User).values(
-            uid=uuid.uuid4().hex,
-            username=username,
-            email=email,
-            password_hash=get_password_hash(password_salt + password),
-            password_salt=password_salt,
-        ).returning(User)
+        query = (
+            insert(User)
+            .values(
+                uid=uuid.uuid4().hex,
+                username=username,
+                email=email,
+                password_hash=get_password_hash(password_salt + password),
+                password_salt=password_salt,
+            )
+            .returning(User)
+        )
 
         result = await self._session.execute(query)
         return result.scalar()

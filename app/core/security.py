@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Any, Optional
 
 from fastapi import HTTPException
 from fastapi.security import APIKeyHeader
@@ -11,10 +11,7 @@ class TodoistTokenHeader(APIKeyHeader):
         super().__init__(*args, **kwargs)
         self.raise_error = raise_error
 
-    async def __call__(
-            self,
-            request: requests.Request,
-    ) -> Optional[str] | None:
+    async def __call__(self, request: requests.Request) -> Optional[str] | None:
         api_key = request.headers.get(self.model.name)
         if not api_key:
             if not self.raise_error:

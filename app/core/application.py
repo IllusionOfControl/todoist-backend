@@ -14,9 +14,7 @@ class Application:
         self._settings = get_app_settings()
         self._settings.logging.configure_logging()
 
-        self._app = FastAPI(
-            lifespan=self.lifespan
-        )
+        self._app = FastAPI(lifespan=self.lifespan)
 
         self.configure_middlewares()
         self.configure_routes()
@@ -47,8 +45,12 @@ class Application:
         # await database.create_database()
 
         logger.info(f"Server Url: {self._settings.server.base_url}")
-        logger.info(f"OpenAPI Docs Url: {self._settings.server.base_url}{self._settings.server.openapi_docs_url}")
-        logger.info(f"Redoc Docs Url: {self._settings.server.base_url}{self._settings.server.redoc_docs_url}")
+        logger.info(
+            f"OpenAPI Docs Url: {self._settings.server.base_url}{self._settings.server.openapi_docs_url}"
+        )
+        logger.info(
+            f"Redoc Docs Url: {self._settings.server.base_url}{self._settings.server.redoc_docs_url}"
+        )
 
         yield
 

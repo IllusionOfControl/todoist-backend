@@ -1,5 +1,10 @@
-from app.core.exceptions import UserNotFoundException, IncorrectLoginInputException, UsernameAlreadyTakenException, \
-    EmailAlreadyTakenException, IncorrectJWTTokenException
+from app.core.exceptions import (
+    EmailAlreadyTakenException,
+    IncorrectJWTTokenException,
+    IncorrectLoginInputException,
+    UsernameAlreadyTakenException,
+    UserNotFoundException,
+)
 from app.core.secutiry import verify_password
 from app.database.repositories.user import UserRepository
 from app.models.user import User
@@ -40,9 +45,7 @@ class AuthenticationService:
             raise EmailAlreadyTakenException()
 
         user = await self._user_repository.create(
-            username=username,
-            email=email,
-            password=password,
+            username=username, email=email, password=password
         )
 
         # TODO: Make refresh token

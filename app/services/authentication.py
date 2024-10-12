@@ -1,13 +1,13 @@
 from app.core.exceptions import UserNotFoundException, IncorrectLoginInputException, UsernameAlreadyTakenException, \
     EmailAlreadyTakenException, IncorrectJWTTokenException
 from app.core.secutiry import verify_password
-from app.database.repositories.users import UsersRepository
-from app.models.users import User
+from app.database.repositories.user import UserRepository
+from app.models.user import User
 from app.services.jwt import JWTService
 
 
 class AuthenticationService:
-    def __init__(self, user_repository: UsersRepository, jwt_service: JWTService):
+    def __init__(self, user_repository: UserRepository, jwt_service: JWTService):
         self._user_repository = user_repository
         self._jwt_service = jwt_service
 

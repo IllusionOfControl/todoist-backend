@@ -1,11 +1,11 @@
 import uuid
 
 from app.core.exceptions import ProjectNotFoundException, ProjectPermissionException
-from app.database.repositories.projects import ProjectRepository
-from app.models.projects import Project
+from app.database.repositories.project import ProjectRepository
+from app.models.project import Project
 
 
-class ProjectsService:
+class ProjectService:
     def __init__(
             self,
             project_repo: ProjectRepository,

@@ -3,8 +3,8 @@ from datetime import datetime
 from sqlalchemy import insert, select, update, delete
 
 from app.database.repositories.base import BaseRepository
-from app.models.projects import Project
-from app.models.tasks import Task
+from app.models.project import Project
+from app.models.task import Task
 
 
 class ProjectRepository(BaseRepository):

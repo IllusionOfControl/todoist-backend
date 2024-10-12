@@ -2,15 +2,15 @@ import uuid
 from datetime import date
 
 from app.core.exceptions import TaskNotFoundException
-from app.database.repositories.tasks import TasksRepository
-from app.models.tasks import Task
-from app.models.users import User
+from app.database.repositories.task import TaskRepository
+from app.models.task import Task
+from app.models.user import User
 from app.schemas.tasks import TaskData
-from app.services.projects import ProjectsService
+from app.services.project import ProjectService
 
 
 class TaskService:
-    def __init__(self, projects_service: ProjectsService, tasks_repository: TasksRepository):
+    def __init__(self, projects_service: ProjectService, tasks_repository: TaskRepository):
         self._projects_service = projects_service
         self._tasks_repository = tasks_repository
 

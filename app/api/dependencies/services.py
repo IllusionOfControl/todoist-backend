@@ -2,15 +2,15 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from app.api.dependencies.repositories import UsersRepositoryDep, TasksRepositoryDep, ProjectsRepositoryDep
+from app.api.dependencies.repositories import UserRepositoryDep, TaskRepositoryDep, ProjectsRepositoryDep
 from app.core.config import get_app_settings
 from app.core.settings.app import AppSettings
-from app.services.projects import ProjectsService
+from app.services.project import ProjectService
 from app.services.authentication import AuthenticationService
 from app.services.jwt import JWTService
-from app.services.tasks import TaskService
+from app.services.task import TaskService
 
-__all__ = ["JWTServiceDep", "AuthenticationServiceDep", "ProjectsServiceDep", "TasksServiceDep"]
+__all__ = ["JWTServiceDep", "AuthenticationServiceDep", "ProjectServiceDep", "TaskServiceDep"]
 
 
 def get_jwt_service(
@@ -23,7 +23,7 @@ JWTServiceDep = Annotated[JWTService, Depends(get_jwt_service)]
 
 
 def get_authentication_service(
-        user_repository: UsersRepositoryDep,
+        user_repository: UserRepositoryDep,
         jwt_service: JWTServiceDep,
 ) -> AuthenticationService:
     return AuthenticationService(
@@ -37,18 +37,18 @@ AuthenticationServiceDep = Annotated[AuthenticationService, Depends(get_authenti
 
 def get_project_service(
         projects_repository: ProjectsRepositoryDep,
-) -> ProjectsService:
-    return ProjectsService(projects_repository)
+) -> ProjectService:
+    return ProjectService(projects_repository)
 
 
-ProjectsServiceDep = Annotated[ProjectsService, Depends(get_project_service)]
+ProjectServiceDep = Annotated[ProjectService, Depends(get_project_service)]
 
 
 def get_task_service(
-        projects_service: ProjectsServiceDep,
-        task_repository: TasksRepositoryDep,
+        projects_service: ProjectServiceDep,
+        task_repository: TaskRepositoryDep,
 ) -> TaskService:
     return TaskService(projects_service, task_repository)
 
 
-TasksServiceDep = Annotated[TaskService, Depends(get_task_service)]
+TaskServiceDep = Annotated[TaskService, Depends(get_task_service)]

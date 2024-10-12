@@ -4,7 +4,7 @@ from fastapi import Depends
 
 from app.api.dependencies.services import AuthenticationServiceDep
 from app.core.security import TodoistTokenHeader
-from app.models.users import User
+from app.models.user import User
 
 __all__ = ["JWTToken", "JWTTokenOptional", "CurrentUser", "CurrentOptionalUser"]
 

@@ -4,10 +4,10 @@ from sqlalchemy import select, insert, delete
 
 from app.core.secutiry import generate_salt, get_password_hash
 from app.database.repositories.base import BaseRepository
-from app.models.users import User
+from app.models.user import User
 
 
-class UsersRepository(BaseRepository):
+class UserRepository(BaseRepository):
     async def get_by_uid(self, uid: str) -> User | None:
         query = select(User).where(User.uid == uid)
 

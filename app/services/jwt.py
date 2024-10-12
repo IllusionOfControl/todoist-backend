@@ -4,7 +4,7 @@ from typing import Dict, Protocol
 import jwt
 from pydantic import ValidationError
 
-from app.models.users import User
+from app.models.user import User
 from app.schemas.jwt import JWTMeta, JWTUser
 
 JWT_SUBJECT = "access"

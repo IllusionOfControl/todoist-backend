@@ -3,12 +3,12 @@ from datetime import date, datetime
 from sqlalchemy import select, insert, update, delete
 
 from app.database.repositories.base import BaseRepository
-from app.models.tasks import Task
+from app.models.task import Task
 
-__all__ = ["TasksRepository"]
+__all__ = ["TaskRepository"]
 
 
-class TasksRepository(BaseRepository):
+class TaskRepository(BaseRepository):
     async def get_all_by_project(self, project_id: int) -> list[Task]:
         query = select(Task).where(Task.project_id == project_id)
         result = await self._session.scalars(query)

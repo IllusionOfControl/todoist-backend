@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from app.schemas import TaskInResponse, ListOfTasksInResponse
 from app.models import User
-from app.database.repositories.tasks import TasksRepository
+from app.database.repositories.task import TaskRepository
 from app.api.dependencies.authentication import get_current_user_authorizer
 from app.api.dependencies.database import get_repository
 
@@ -14,7 +14,7 @@ router = APIRouter()
 )
 async def list_unfinished_tasks(
     current_user: User = Depends(get_current_user_authorizer()),
-    task_repo: TasksRepository = Depends(get_repository(TasksRepository))
+    task_repo: TaskRepository = Depends(get_repository(TaskRepository))
 ) -> ListOfTasksInResponse:
     tasks = await task_repo.get_all_unfinished_tasks_by_owner_id(owner_id=current_user.id)
 
@@ -34,7 +34,7 @@ async def list_unfinished_tasks(
 )
 async def list_unfinished_tasks_for_next_7_days(
     current_user: User = Depends(get_current_user_authorizer()),
-    task_repo: TasksRepository = Depends(get_repository(TasksRepository))
+    task_repo: TaskRepository = Depends(get_repository(TaskRepository))
 ) -> ListOfTasksInResponse:
     tasks = await task_repo.get_tasks_for_next_7_days(owner_id=current_user.id)
 
@@ -54,7 +54,7 @@ async def list_unfinished_tasks_for_next_7_days(
 )
 async def list_unfinished_tasks_for_today(
     current_user: User = Depends(get_current_user_authorizer()),
-    task_repo: TasksRepository = Depends(get_repository(TasksRepository))
+    task_repo: TaskRepository = Depends(get_repository(TaskRepository))
 ) -> ListOfTasksInResponse:
     tasks = await task_repo.get_tasks_for_today(owner_id=current_user.id)
 

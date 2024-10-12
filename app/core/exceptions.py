@@ -13,9 +13,9 @@ class BaseInternalException(Exception):
     _errors: Iterable[str] | None = None
 
     def __init__(self, status_code: int | None = None, message: str | None = None, errors: Iterable[str] = None):
-        self._status_code = status_code
-        self._message = message
-        self._errors = errors
+        self._status_code = status_code or self._status_code
+        self._message = message or self._message
+        self._errors = errors or self._errors
 
     @property
     def status_code(self) -> int:
@@ -58,11 +58,6 @@ class ProjectPermissionException(BaseInternalException):
 class TaskNotFoundException(BaseInternalException):
     _status_code = 404
     _message = "task with this id does not exist."
-
-
-class TaskPermissionException(BaseInternalException):
-    _status_code = 403
-    _message = "you do not have permission to access this task."
 
 
 class EmailAlreadyTakenException(BaseInternalException):

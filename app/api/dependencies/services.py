@@ -45,9 +45,10 @@ ProjectsServiceDep = Annotated[ProjectsService, Depends(get_project_service)]
 
 
 def get_task_service(
+        projects_service: ProjectsServiceDep,
         task_repository: TasksRepositoryDep,
 ) -> TaskService:
-    return TaskService(task_repository)
+    return TaskService(projects_service, task_repository)
 
 
 TasksServiceDep = Annotated[TaskService, Depends(get_task_service)]

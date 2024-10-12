@@ -4,20 +4,24 @@ from datetime import date
 from app.core.exceptions import TaskNotFoundException
 from app.database.repositories.tasks import TasksRepository
 from app.models.tasks import Task
+from app.models.users import User
 from app.schemas.tasks import TaskData
+from app.services.projects import ProjectsService
 
 
 class TaskService:
-    def __init__(self, tasks_repository: TasksRepository):
+    def __init__(self, projects_service: ProjectsService, tasks_repository: TasksRepository):
+        self._projects_service = projects_service
         self._tasks_repository = tasks_repository
 
-    async def create_task(self, project_id: int, content: str, is_finished: bool,
+    async def create_task(self, current_user: User, project_uid: str, content: str, is_finished: bool,
                           scheduled_at: date | None) -> TaskData:
+        project = await self._projects_service.retrieve_project(current_user.id, project_uid)
 
         task = await self._tasks_repository.create_task(
             uuid.uuid4().hex,
             content,
-            project_id,
+            project.id,
             is_finished,
             scheduled_at,
         )
@@ -30,17 +34,20 @@ class TaskService:
             updated_at=task.updated_at,
         )
 
-    async def retrieve_all_tasks(self, project_id: int) -> list[Task]:
-        tasks = await self._tasks_repository.get_all_by_project(project_id)
+    async def retrieve_all_tasks(self, current_user: User, project_uid: str) -> list[Task]:
+        project = await self._projects_service.retrieve_project(current_user.id, project_uid)
+        tasks = await self._tasks_repository.get_all_by_project(project.id)
         return tasks
 
-    async def retrieve_task(self, project_id: int, task_uid: str) -> Task:
-        task = await self._tasks_repository.get_for_project_by_uid(project_id, task_uid)
+    async def retrieve_task(self, current_user: User, project_uid: str, task_uid: str) -> Task:
+        project = await self._projects_service.retrieve_project(current_user.id, project_uid)
+        task = await self._tasks_repository.get_for_project_by_uid(project.id, task_uid)
         return task
 
-    async def update_task(self, project_id: int, task_uid: str, content: str | None, is_finished: str | None,
+    async def update_task(self, current_user: User, project_uid: str, task_uid: str, content: str | None, is_finished: str | None,
                           scheduled_at: date | None) -> Task:
-        task = await self._tasks_repository.get_for_project_by_uid(project_id, task_uid)
+        project = await self._projects_service.retrieve_project(current_user.id, project_uid)
+        task = await self._tasks_repository.get_for_project_by_uid(project.id, task_uid)
         if not task:
             raise TaskNotFoundException()
 
@@ -53,15 +60,17 @@ class TaskService:
 
         return task
 
-    async def delete_task(self, project_id: int, task_uid: str) -> Task:
-        task = await self._tasks_repository.get_for_project_by_uid(project_id, task_uid)
+    async def delete_task(self, current_user: User, project_uid: str, task_uid: str) -> Task:
+        project = await self._projects_service.retrieve_project(current_user.id, project_uid)
+        task = await self._tasks_repository.get_for_project_by_uid(project.id, task_uid)
         if not task:
             raise TaskNotFoundException()
 
         return task
 
-    async def get_task(self, project_id: int, task_uid: str) -> Task:
-        task = await self._tasks_repository.get_for_project_by_uid(project_id, task_uid)
+    async def get_task(self, current_user: User, project_uid: str, task_uid: str) -> Task:
+        project = await self._projects_service.retrieve_project(current_user.id, project_uid)
+        task = await self._tasks_repository.get_for_project_by_uid(project.id, task_uid)
 
         if not task:
             raise TaskNotFoundException()

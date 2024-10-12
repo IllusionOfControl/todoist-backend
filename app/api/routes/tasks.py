@@ -54,12 +54,16 @@ async def get_all_tasks(
 async def create_task(
         project_uid: str,
         task_to_create: TaskToCreate,
-        projects_service: ProjectsServiceDep,
         tasks_service: TasksServiceDep,
         current_user: CurrentUser
 ) -> TodoistResponse[TaskData]:
-    project = await projects_service.retrieve_project(current_user.id, project_uid)
-    task = await tasks_service.create_task(project.id, task_to_create.content, task_to_create.is_finished, task_to_create.scheduled_at)
+    task = await tasks_service.create_task(
+        current_user,
+        project_uid,
+        task_to_create.content,
+        task_to_create.is_finished,
+        task_to_create.scheduled_at
+    )
 
     return TodoistResponse(
         success=True,
@@ -82,12 +86,10 @@ async def create_task(
 async def get_task(
         project_uid: str,
         task_uid: str,
-        projects_service: ProjectsServiceDep,
         tasks_service: TasksServiceDep,
         current_user: CurrentUser
 ) -> TodoistResponse[TaskData]:
-    project = await projects_service.retrieve_project(current_user.id, project_uid)
-    task = await tasks_service.retrieve_task(project.id, task_uid)
+    task = await tasks_service.retrieve_task(current_user, project_uid, task_uid)
 
     return TodoistResponse(
         success=True,
@@ -110,12 +112,10 @@ async def get_task(
 async def delete_task(
         project_uid: str,
         task_uid: str,
-        projects_service: ProjectsServiceDep,
         tasks_service: TasksServiceDep,
         current_user: CurrentUser
 ) -> TodoistResponse[TaskData]:
-    project = await projects_service.retrieve_project(current_user.id, project_uid)
-    task = await tasks_service.delete_task(project.id, task_uid)
+    task = await tasks_service.delete_task(current_user, project_uid, task_uid)
 
     return TodoistResponse(
         success=True,
@@ -136,13 +136,14 @@ async def delete_task(
     name="tasks:update",
 )
 async def update_task(
+        project_uid: str,
         task_uid: str,
         task_to_update: TaskToUpdate,
         task_service: TasksServiceDep,
         current_user: CurrentUser,
 ) -> TodoistResponse[TaskData]:
     updated_task = await task_service.update_task(
-        current_user, task_uid, task_to_update
+        current_user, project_uid, task_uid, task_to_update
     )
     return TodoistResponse(
         success=True,
